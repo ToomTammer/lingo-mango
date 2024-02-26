@@ -51,6 +51,7 @@
   import questionJson from '@/resource/question_word.json';
   import CardSquare from '@/resource/cardSquare.json';
   import vol2 from '@/resource/vol2.json';
+  import mics from '@/resource/micAnimate.json';
   // import imgBas from "@/assets/SportAndGame/word/img/bas.png";
   // import imgSoccer from "@/assets/SportAndGame/word/img/ball.png";
   // import vBas from "@/assets/SportAndGame/word/voice/which_is_soccer.mp3";
@@ -61,6 +62,13 @@
   export default {
     data() {
       return {
+        isListening : false,
+        tracks : [],
+        audioCtx: null,
+        distortion: null,
+        gainNode: null,
+        biquadFilter: null,
+        analyser: null,
         voiceWord: null,
         containerVoiceWord: null,
         music: null,
@@ -69,12 +77,12 @@
         isloaded: false,
         showbtn: true,
         isVoiceQuestion: false,
+        IsAble: true,
         scaleOpt: 0.7,
         scaleOpt1: 0.7,
         scaleOpt2: 0.7,
         scaleOpt3: 0.7,
         containerScaleOpt : ['scaleOpt1', 'scaleOpt2', 'scaleOpt3'],
-        scaleQ4: 1,
         opt1: 0,
         opt2: 0,
         opt3: 0,
@@ -84,6 +92,8 @@
         textureCardOpt1: 0,
         textureCardOpt2: 0,
         textureCardOpt3: 0,
+        isVisibleSec1 : true,
+        isVisibleSec2 : false,
         textureCardOpt4: 0,
         textures:[],
         texturesCardBG:[],
@@ -106,6 +116,16 @@
         scaleVol2: 0.6,
         textureVol2: 0,
 
+        mics: mics.micList,
+        animateMics:[],
+        scaleMicDefault: 0.6,
+        scaleMic: 0.6,
+        scaleBgMic: 0.6,
+        textureMic: 0,
+        texturebgMic: 3,
+
+        scaleQ4: 1,
+
 
       };
     },
@@ -123,9 +143,25 @@
     },
     async mounted() {
       localStorage.removeItem('allPlayerData');
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      this.distortion = this.audioCtx.createWaveShaper();
+      this.gainNode = this.audioCtx.createGain();
+      this.biquadFilter = this.audioCtx.createBiquadFilter();
+      this.analyser = this.audioCtx.createAnalyser();
+      this.analyser.minDecibels = -90;
+      this.analyser.maxDecibels = -10;
+      this.analyser.fftSize = 256;
+
+      console.log("this.audioCtx", this.audioCtx);
+      console.log("this.distortion", this.distortion);
+      console.log("this.gainNode", this.gainNode);
+      console.log("this.biquadFilter", this.biquadFilter);
+      console.log("this.analyser", this.analyser);
+
       await this.setTextures('answers','SportAndGame/word/img/','textures');
       await this.setTextures('CardSquare','','texturesCardBG');
       await this.setTextures('vol2','','animateVol2');
+      await this.setTextures('mics','','animateMics');
       // await this.setAudio('questions','/SportAndGame/word/voice/','texturesCardBG');
       this.playerName = await localStorage.getItem('playerName') || 'unknown';
       let IsExistPlayer =  await this.checkExistPlayerData();
@@ -202,6 +238,9 @@
       const initialTextureCardBG2 = this.texturesCardBG[this.textureCardOpt2];
       const initialTextureCardBG3 = this.texturesCardBG[this.textureCardOpt3];
       const initialTextureVol2 = this.animateVol2[this.textureVol2];
+      const initialTexturebtnMic = this.animateMics[this.textureMic];
+      const initialTextureBgbtnMic = this.animateMics[this.texturebgMic];
+      
 
       // Vol2
       const materialVol2 = new THREE.MeshBasicMaterial({
@@ -291,12 +330,37 @@
         map: initialTextureCardBG1,
         side:THREE.DoubleSide,
         transparent: true,
-        opacity: 0 });
+        opacity: 1 });
       const CardBGOpt4 = new THREE.Mesh(
         new THREE.PlaneGeometry(this.scaleQ4, this.scaleQ4),
         materialCardBG4);
       CardBGOpt4.position.x = -0.8;
       scene.add(CardBGOpt4);
+
+      // BGbtnMic
+      const materialBgMic = new THREE.MeshBasicMaterial({
+        map: initialTextureBgbtnMic,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const bgBtnMic = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleMic, this.scaleMic),
+        materialBgMic);
+        bgBtnMic.position.x = 0.5;
+      scene.add(bgBtnMic);
+
+      // btnMic
+      const materialMic = new THREE.MeshBasicMaterial({
+        map: initialTexturebtnMic,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const btnMic = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleMic, this.scaleMic),
+        materialMic);
+        btnMic.position.x = 0.5;
+      scene.add(btnMic);
+
 
 
       //Object End
@@ -316,11 +380,11 @@
           // set the cursor style to 'pointer' if an object is being hovered over
           raycaster.setFromCamera(mouse, this.camera);
           // const intersects = raycaster.intersectObjects(scene.children);
-          const intersects = raycaster.intersectObjects([imgOpt1, imgOpt2, imgOpt3, btnVol2]); // check for both cubes
+          const intersects = raycaster.intersectObjects([imgOpt1, imgOpt2, imgOpt3, btnVol2, btnMic]); // check for both cubes
           if (intersects.length > 0) {
             if (
               intersects[0].object === imgOpt1 || intersects[0].object === imgOpt2 || intersects[0].object === imgOpt3 
-              || intersects[0].object === btnVol2
+              || intersects[0].object === btnVol2 || intersects[0].object === btnMic
             ) {
               document.body.style.cursor = "pointer";
             }
@@ -343,31 +407,35 @@
         raycaster.setFromCamera(mouse2, this.camera);
 
         // get the intersecting object(s)
-        const intersects = raycaster.intersectObjects([imgOpt1, imgOpt2, imgOpt3, btnVol2]); // check for both cubes
+        const intersects = raycaster.intersectObjects([imgOpt1, imgOpt2, imgOpt3, btnVol2, btnMic]); // check for both cubes
 
         // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
         if (intersects.length > 0) {
-          if (intersects[0].object === imgOpt1) {
+          if (intersects[0].object === imgOpt1 && this.IsAble) {
             console.log("Click img Option1" , this.opt1);
             await this.nextQuestion(this.opt1);
-            await this.animateAnsWrong(0);
+            await this.animateAns(0);
             await this.animateChangeQuestion();
           }
-          if (intersects[0].object === imgOpt2) {
+          if (intersects[0].object === imgOpt2 && this.IsAble) {
             console.log("Click img Option2", this.opt2);
             await this.nextQuestion(this.opt2);
-            await this.animateAnsWrong(1);
+            await this.animateAns(1);
             await this.animateChangeQuestion();
           }
-          if (intersects[0].object === imgOpt3) {
+          if (intersects[0].object === imgOpt3 && this.IsAble) {
             console.log("Click img Option3", this.opt3);
             await this.nextQuestion(this.opt3);
-            await this.animateAnsWrong(2);
+            await this.animateAns(2);
             await this.animateChangeQuestion();
           }
-          if (intersects[0].object === btnVol2) {
+          if (intersects[0].object === btnVol2 && this.IsAble) {
             console.log("Click img btnVol2", this.opt3);
             this.playMusic();
+          }
+          if (intersects[0].object === btnMic && this.IsAble) {
+            console.log("Click img btnVol2", this.opt3);
+            this.SpeechRecognition();
           }
         }
       });
@@ -375,6 +443,13 @@
       // render the scene
       const render = () => {
         requestAnimationFrame(render);
+        if (this.isListening){
+          let bufferLength = this.analyser.frequencyBinCount;
+          let dataArray = new Uint8Array(bufferLength);
+          this.analyser.getByteFrequencyData(dataArray);
+          const level = Math.max.apply(null, dataArray);
+          this.scaleBgMic = level / 150;
+        }
 
         const currentTime = Date.now();
         if (currentTime - lastFrameTime > frameDuration) {
@@ -389,28 +464,59 @@
         btnVol2.material.map = this.animateVol2[this.textureVol2];
         btnVol2.material.needsUpdate = true;
         btnVol2.scale.set(this.scaleVol2, this.scaleVol2);
+        btnVol2.visible = this.isVisibleSec1;
 
         imgOpt1.material.map = this.textures[this.textureOpt1];
         imgOpt1.material.needsUpdate = true;
+        imgOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
+        imgOpt1.visible = this.isVisibleSec1;
         CardBGOpt1.material.map = this.texturesCardBG[this.textureCardOpt1];
         CardBGOpt1.material.needsUpdate = true;
+        CardBGOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
+        CardBGOpt1.visible = this.isVisibleSec1;
 
         imgOpt2.material.map = this.textures[this.textureOpt2];
         imgOpt2.material.needsUpdate = true;
+        imgOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
+        imgOpt2.visible = this.isVisibleSec1;
         CardBGOpt2.material.map = this.texturesCardBG[this.textureCardOpt2];
         CardBGOpt2.material.needsUpdate = true;
+        CardBGOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
+        CardBGOpt2.visible = this.isVisibleSec1;
 
         imgOpt3.material.map = this.textures[this.textureOpt3];
         imgOpt3.material.needsUpdate = true;
+        imgOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
+        imgOpt3.visible = this.isVisibleSec1;
         CardBGOpt3.material.map = this.texturesCardBG[this.textureCardOpt3];
         CardBGOpt3.material.needsUpdate = true;
-
-        imgOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
-        imgOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
-        imgOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
-        CardBGOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
-        CardBGOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
         CardBGOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
+        CardBGOpt3.visible = this.isVisibleSec1;
+
+        
+        CardBGOpt4.material.map = this.texturesCardBG[this.textureCardOpt3];
+        CardBGOpt4.material.needsUpdate = true;
+        CardBGOpt4.scale.set(this.scaleQ4, this.scaleQ4);
+        CardBGOpt4.visible = this.isVisibleSec2;
+        // CardBGOpt4.material.opacity = this.scaleQ4Opacity;
+
+        btnMic.material.map = this.animateMics[this.textureMic];
+        btnMic.material.needsUpdate = true;
+        btnMic.scale.set(this.scaleMic, this.scaleMic);
+        btnMic.visible = this.isVisibleSec2;
+
+        bgBtnMic.material.map = this.animateMics[this.texturebgMic];
+        bgBtnMic.material.needsUpdate = true;
+        bgBtnMic.scale.set(this.scaleBgMic, this.scaleBgMic);
+        bgBtnMic.visible = this.isVisibleSec2;
+        
+
+        
+        
+        
+        
+        
+        
 
         // Smoothly move the camera along the X-axis
         this.camera.position.x += (-cameraX - this.camera.position.x) * 0.05;
@@ -527,9 +633,9 @@
         console.log("setTextures Complete");
       },
 
-      async setAudio(data, path) {
+      async setAudio(data, path, val) {
         console.log("###setAudio");
-        const GetAudio = require('@/assets/' + path + data.voice2);
+        const GetAudio = require('@/assets/' + path + data[val]);
         this.containerVoiceWord = GetAudio;
         console.log("Audio", GetAudio);
         this.loadMusic(this.containerVoiceWord);
@@ -629,8 +735,8 @@
         console.log("question_no : ", question_no);
         let textures_no = await this.answers.findIndex(tx => tx.guid === this.playerData.game[question_no].ans.guid);
         this[correctImgOpt] = textures_no;
-    
-        await this.setAudio(this.playerData.game[question_no], 'SportAndGame/word/voice/');
+        let audio_no = question_no != 3 ? 1 : 2; 
+        await this.setAudio(this.playerData.game[question_no], 'SportAndGame/word/voice/', `voice${audio_no}`);
 
         const answersToShuffle = this.answers.filter(answer => answer.guid != this.playerData.game[question_no].ans.guid);
         const selectedItems_other = answersToShuffle.sort(() => 0.5 - Math.random());
@@ -649,6 +755,7 @@
 
       async nextQuestion(point) {
         console.log("###nextQuestion");
+        this.IsAble = false;
         console.log("this.allPlayerData :", this.allPlayerData);
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
         if (currentPlayerIndex !== -1) {
@@ -680,7 +787,7 @@
           }
       },
       
-      animateAnsWrong(card_no) {
+      animateAns(card_no) {
         const ScaleOpt = this.containerScaleOpt;
         let cardNo =ScaleOpt[card_no];
         const tl = gsap.timeline();
@@ -690,6 +797,15 @@
 
       animateChangeQuestion() {
         console.log("###animateChangeQuestion1");
+        if(this.playerData.question_no != 3){
+          this.animateChangeQuestionOpt();
+        }else{
+          this.isVisibleSec2 = true;
+          this.animateChangeQuestionVoice();
+        }
+      },
+      
+      animateChangeQuestionOpt(){
         const tl = gsap.timeline();
         tl.to(this.$data, 
         { 
@@ -708,9 +824,137 @@
           scaleOpt1: 0.7, 
           scaleOpt2: 0.7,
           scaleOpt3: 0.7,
-          ease: "bounce.out"
+          ease: "bounce.out",
+          onComplete: async () => {
+            this.IsAble = true;
+          },
         });
       },
+
+      animateChangeQuestionVoice() {
+        console.log("###animateChangeQuestion1");
+        const tl = gsap.timeline();
+        tl.to(this.$data, 
+        { 
+          delay: 1,
+          duration: 0.5, 
+          scaleOpt1: 0, 
+          scaleOpt2: 0,
+          scaleOpt3: 0,
+          scaleVol2: 0,
+          onComplete: async () => {
+            this.isVisibleSec1 = false;
+            await this.SetRandomAns();
+          },
+        })
+        .from(this.$data, 
+        { 
+          duration: 1, 
+          scaleQ4: 0,
+          scaleMic: 0,
+          scaleBgMic: 0,
+          ease: "bounce.out",
+          onComplete: async () => {
+            this.IsAble = true;
+            this.isVisibleSec2 = true
+          },
+        });
+      },
+      async SpeechRecognition(){
+        let timeoutId; // Variable to hold timeout ID
+        let words= null;
+        let transcript;
+        const stopRecognition = () => {
+            this.isListening = false;
+            const tl = gsap.timeline();
+            tl.to(this.$data, 
+            { 
+              duration: 1, 
+              scaleBgMic: this.scaleMicDefault,
+            })
+            this.tracks.forEach((track) => {
+              track.stop();
+            });
+            if (this.recognition) {
+                this.recognition.stop(); // Stop speech recognition if it's running
+            }
+            clearTimeout(timeoutId); // Clear the timeout
+        };
+
+        if (!this.isListening) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.isListening = true;
+
+            this.tracks = stream.getTracks();
+            const source = this.audioCtx.createMediaStreamSource(stream);
+            source.connect(this.distortion);
+            this.distortion.connect(this.biquadFilter);
+            this.biquadFilter.connect(this.gainNode);
+            this.gainNode.connect(this.analyser);
+            // this.analyser.connect(this.audioCtx.destination);
+
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.log("SpeechRecognition is not supported in this browser.");
+                return;
+            }
+            
+
+            const recognition = new SpeechRecognition(); // Create a new SpeechRecognition object
+            recognition.lang = 'en-US'; // Set language to English
+            recognition.continuous = true; // Continuously recognize speech
+            recognition.interimResults = false; // Get final results only
+            // Set maximum length of recognized phrase
+            const MAX_PHRASE_LENGTH = 10; // for example, allow phrases up to 5 words
+            recognition.onresult = (event) => { // Event handler when speech is recognized
+                transcript = event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
+                words = transcript.split(' '); // Split transcript into words
+                console.log('Transcript:', transcript);
+                if (words.length >= MAX_PHRASE_LENGTH) {
+                  stopRecognition();
+                    console.log('Phrase is too long. Ignoring.');
+                }
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopRecognition(); // Stop recognition on error
+            };
+            recognition.onend = () => {
+                console.log('Speech recognition ended.');
+                stopRecognition(); // Stop recognition when it naturally ends
+                // Check if the number of words is within the allowed threshold
+                
+                if (words !== null && words.length <= MAX_PHRASE_LENGTH) {
+                    // Check if the transcript contains the specific words
+                    if (transcript.includes('pingpong')) {
+                        console.log('Pingpong detected!');
+                        // Perform actions for pingpong
+                    }
+                    if (transcript.includes('ball')) {
+                        console.log('Ball detected!');
+                        
+                        // Perform actions for ball
+                    }
+                }
+              };
+
+            recognition.start(); // Start speech recognition
+            this.recognition = recognition; // Save the recognition object for later use
+
+            // Set timeout for silence
+            timeoutId = setTimeout(() => {
+                console.log('No speech detected. Stopping recognition.');
+            }, 30000); // 10 seconds
+
+          } catch (err) {
+            console.log('The following gUM error occured: ' + err);
+          }
+        } else {
+          stopRecognition(); // Stop recognition if already listening
+        }
+      },
+
       
       backtoCate() {
         gsap.to(this.camera.position, {

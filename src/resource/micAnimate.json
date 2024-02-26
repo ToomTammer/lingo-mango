@@ -1,0 +1,21 @@
+{
+    "micList": [
+      {
+        "guid": 0,
+        "img": "mic_open.png"
+      },
+      {
+        "guid": 1,
+        "img": "mic_open.png"
+      },
+      {
+        "guid": 2,
+        "img": "mic_open.png"
+      },
+      {
+        "guid": 2,
+        "img": "vol_close.png"
+      }
+    ]
+  }
+  
