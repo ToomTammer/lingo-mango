@@ -1,8 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import mitt from 'mitt'
 
-// Import our custom CSS
-import 'bootstrap/dist/css/bootstrap.min.css'
+const emitter = mitt();
+const app = createApp(App);
+app.config.globalProperties.emitter = emitter;
 
-createApp(App).use(router).mount('#app')
+app.use(router).mount('#app')

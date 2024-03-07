@@ -2,58 +2,58 @@
   "answers": [
     {
       "guid": 0,
-      "title": "ping-pong",
-      "img": "ball.png"
+      "title": "ping pong",
+      "img": "ping_pong.png"
     },
     {
       "guid": 1,
       "title": "badminton",
-      "img": "ball.png"
+      "img": "badminton.png"
     },
     {
       "guid": 2,
       "title": "basketball",
-      "img": "bas.png"
+      "img": "basketball.png"
     },
     {
       "guid": 3,
       "title": "checkers",
-      "img": "ball.png"
+      "img": "checkers.png"
     },
     {
       "guid": 4,
       "title": "chess",
-      "img": "ball.png"
-    },
-    {
-      "guid": 5,
-      "title": "hide and seek",
-      "img": "ball.png"
+      "img": "chess.png"
     },
     {
       "guid": 6,
       "title": "soccer",
-      "img": "ball.png"
+      "img": "soccer.png"
     },
     {
       "guid": 7,
       "title": "volleyball",
-      "img": "ball.png"
+      "img": "volleyball.png"
     },
     {
       "guid": 8,
       "title": "seesaw",
-      "img": "ball.png"
+      "img": "seesaw.png"
     },
     {
       "guid": 9,
       "title": "slide",
-      "img": "ball.png"
+      "img": "slide.png"
     },
     {
       "guid": 10,
       "title": "swing",
-      "img": "ball.png"
+      "img": "swing.png"
+    },
+    {
+      "guid": 11,
+      "title": "jigsaws",
+      "img": "jigsaws.png"
     }
   ]
 }

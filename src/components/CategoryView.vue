@@ -1,4 +1,5 @@
 <template>
+  <PageLoader />
   <div id="webglCanvas" ref="container"></div>
   <div class="effect-hot-spot">
     <div class="loading-tips"></div>
@@ -7,49 +8,11 @@
         <div class="container-rl">
           <div class="sub-container-rl">
             <div class="gesture" ref="containerVI"></div>
-            <div class="label">
-              <div class="txtArea">
-                <div class="txt">player: TOOMTAM </div>
+              <div class="label">
+                  <div class="txtArea">
+                    <div class="txt">Player: {{playerName}}</div>
+                  </div>
               </div>
-            </div>
-            <!-- <div class="sub-sub-container-rl">
-              <div class="messagebtn no-select">
-                คลิกเมาส์ค้างไว้แล้วลากเพื่อเลื่อนภาพ/กดแป้นพิมพ์ตัว ← →
-                เพื่อควบคุมการเคลื่อนไหวของภาพ
-              </div>
-              <div class="rlbtn">
-                <div
-                  @mousedown="moveLeft = true"
-                  @mouseup="moveLeft = false"
-                  @mouseout="moveLeft = false"
-                  @touchstart="moveLeft = true"
-                  @touchend="moveLeft = false"
-                  @touchcancel="moveLeft = false"
-                  class="sub-rlbtn"
-                >
-                  <img
-                    src="@/assets/box1.png"
-                    alt="LEFT"
-                    draggable="false"
-                  />
-                </div>
-                <div
-                  @mousedown="moveRight = true"
-                  @mouseup="moveRight = false"
-                  @mouseout="moveRight = false"
-                  @touchstart="moveRight = true"
-                  @touchend="moveRight = false"
-                  @touchcancel="moveRight = false"
-                  class="sub-rlbtn"
-                >
-                  <img
-                    src="@/assets/box1.png"
-                    alt="RIGHT"
-                    draggable="false"
-                  />
-                </div>
-              </div>
-            </div> -->
           </div>
         </div>
       </div>
@@ -61,29 +24,33 @@
 <script >
 import { gsap } from "gsap";
 import * as THREE from "three";
+import PageLoader from "@/components/PageLoader.vue";
+import cateJson from '@/resource/catgatories.json';
 import Hammer from "hammerjs";
 
-import le from "@/assets/box1.png";
-import frame1 from "@/assets/animationTest/frame_(1).gif";
-import frame2 from "@/assets/animationTest/frame_(2).gif";
-import frame3 from "@/assets/animationTest/frame_(3).gif";
-
-
 export default {
+  components: {
+    PageLoader,
+  },
   data() {
     return {
+      isRestartNewGame : false,
+      music: null,
+      IsAble : true,
       isloaded: false,
-      showbtn: true,
-      speedCameraX: 0.03,
+      imagesCateUnit7 : cateJson[0].unit7,
+      texturesCateUnit7:[],
+      textureCateUnit7No: 0,
+      playerName: '',
+      opacityAll: 0,
+      scaleUnit71: 1.5,
+      scaleUnit72: 0.7,
+      scaleUnit73: 0.7,
 
-      el2:le,
-      textureUrls : [frame1, frame2, frame3],
-
+      sceneZ : -1,
+      sceneY : 0,
 
     };
-  },
-  components: {
-    // PageLoader,
   },
   created() {
     // Reload the page once
@@ -94,11 +61,15 @@ export default {
       sessionStorage.removeItem("isReloaded");
     }
   },
-  mounted() {
+  async mounted() {
+    this.animatestart();
+    await this.GetPlayerName();
+    await this.setTextures('imagesCateUnit7','catagories/','texturesCateUnit7');
+    console.log("imagesCateUnit7", this.imagesCateUnit7 );
+
     window.addEventListener("load", (event) => {
       if (event.target.readyState === "complete") {
-        this.AnimationStart();
-        this.PlayNavi();
+        console.log("load complete" );
       }
     });
 
@@ -110,20 +81,18 @@ export default {
 
     // create the camera
     let cameraX = 0; // initialize the X position of the camera
-    let cameraZ = 0; // initialize the Z position of the camera  
+    let cameraZ = 0; // initialize the Z position of the camera
     let cameraY = 0; // initialize the Y position of the camera
 
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
 
-    scene.position.z = -1;
-
-    // Animation variables
-    let frameIndex = 0;
-    const frameDuration = 200; // Milliseconds per frame
-    let lastFrameTime = 0;
+    scene.position.z = this.sceneZ;
+    scene.position.y = this.sceneY;
+    // scene.position.y = 0.1;
 
     // create the renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.addEventListener("webglcontextlost", function () {
       location.reload();
@@ -135,51 +104,88 @@ export default {
 
     //Object Start
 
+    // Animation variables
+    // let frameIndex = 0;
+    const frameDuration = 200; // Milliseconds per frame
+    let lastFrameTime = 0;
+
     // Load textures
-      const textures = [];
-      const textureLoader = new THREE.TextureLoader();
-      this.textureUrls.forEach(url => {
-        const texture = textureLoader.load(url);
-        textures.push(texture);
-      });
-      // Create a mesh with initial texture
-      const initialTexture = textures[0];
-      const geometry = new THREE.PlaneGeometry(0.5, 0.5); // Adjust the size as needed
-      const material = new THREE.MeshBasicMaterial({ map: initialTexture, side: THREE.DoubleSide,transparent: true, opacity: 1});
-      const mesh = new THREE.Mesh(geometry, material);
+    const initialTextureUnit71 = this.texturesCateUnit7[this.textureCateUnit7No];
+    const initialTextureUnit72 = this.texturesCateUnit7[this.textureCateUnit7No +1];
+    const initialTextureUnit73 = this.texturesCateUnit7[this.textureCateUnit7No +2];
+    const initialTextureUnit74 = this.texturesCateUnit7[this.textureCateUnit7No +1];
+    const initialTextureUnit75 = this.texturesCateUnit7[this.textureCateUnit7No +3];
 
-      mesh.position.x = -0.4;
-      scene.add(mesh);
 
-    // // create the title cldL3 image
-    // const texturecldL3 = new THREE.TextureLoader().load(cldL3);
-    // const ImagecldL3 = new THREE.Mesh(
-    //   new THREE.PlaneGeometry(this.cloudSize, this.cloudSize),
-    //   new THREE.MeshBasicMaterial({
-    //     map: texturecldL3,
-    //     side: THREE.DoubleSide,
-    //     transparent: true,
-    //     opacity: 1,
-    //   })
-    // );
-    // ImagecldL3.position.y = this.cloudLY;
-    // ImagecldL3.position.x = this.cloudLX;
-    // scene.add(ImagecldL3);
+
+    // Unit71
+    const materialUnit71 = new THREE.MeshBasicMaterial({
+      map: initialTextureUnit71,
+      side:THREE.DoubleSide,
+      transparent: true,
+      opacity: 1 });
+    const CardUnit71 = new THREE.Mesh(
+      new THREE.PlaneGeometry(this.scaleUnit71, this.scaleUnit71),
+      materialUnit71);
+    scene.add(CardUnit71);
+
+    // bgUnit72
+    const materialUnit72 = new THREE.MeshBasicMaterial({
+      map: initialTextureUnit72,
+      side:THREE.DoubleSide,
+      transparent: true,
+      opacity: 1 });
+    const CardUnit72 = new THREE.Mesh(
+      new THREE.PlaneGeometry(this.scaleUnit72, this.scaleUnit72),
+      materialUnit72);
+    scene.add(CardUnit72);
+    CardUnit72.position.x = -0.4;
+    CardUnit72.position.y = -0.1;
+
+    // Unit73
+    const materialUnit73 = new THREE.MeshBasicMaterial({
+      map: initialTextureUnit73,
+      side:THREE.DoubleSide,
+      transparent: true,
+      opacity: 1 });
+    const CardUnit73 = new THREE.Mesh(
+      new THREE.PlaneGeometry(this.scaleUnit73, this.scaleUnit73),
+      materialUnit73);
+    scene.add(CardUnit73);
+    CardUnit73.position.x = -0.4;
+    CardUnit73.position.y = 0;
+
+     // bgUnit74
+     const materialUnit74 = new THREE.MeshBasicMaterial({
+      map: initialTextureUnit74,
+      side:THREE.DoubleSide,
+      transparent: true,
+      opacity: 1 });
+    const CardUnit74 = new THREE.Mesh(
+      new THREE.PlaneGeometry(this.scaleUnit72, this.scaleUnit72),
+      materialUnit74);
+    scene.add(CardUnit74);
+    CardUnit74.position.x = 0.4;
+    CardUnit74.position.y = -0.1;
+
+    // Unit75
+    const materialUnit75 = new THREE.MeshBasicMaterial({
+      map: initialTextureUnit75,
+      side:THREE.DoubleSide,
+      transparent: true,
+      opacity: 1 });
+    const CardUnit75 = new THREE.Mesh(
+      new THREE.PlaneGeometry(this.scaleUnit73, this.scaleUnit73),
+      materialUnit75);
+    scene.add(CardUnit75);
+    CardUnit75.position.x = 0.4;
+    CardUnit75.position.y = 0;
+
 
     //Object End
 
-
-    // Keyboard controls
-    const keyboard = {};
-    window.addEventListener("keydown", (event) => {
-      keyboard[event.code] = true;
-    });
-    window.addEventListener("keyup", (event) => {
-      keyboard[event.code] = false;
-    });
-
-    // Add swipe gesture recognition with Hammer.js
-    const vm = this; // capture the Vue component instance
+     // Add swipe gesture recognition with Hammer.js
+    //  const vm = this; // capture the Vue component instance
     const mc = new Hammer.Manager(this.$refs.containerVI);
     mc.add(
       new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 0 })
@@ -191,96 +197,107 @@ export default {
       if (ev.direction === Hammer.DIRECTION_LEFT) {
         cameraX -= 0.03;
       } else if (ev.direction === Hammer.DIRECTION_RIGHT) {
-        cameraX += 0.03;
-        vm.elOpty += 0.05;
+        cameraX += 0.03 ;
       }
     });
-
     // create the parallax effect
-    // initialize raycaster and mouse
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const mouse2 = new THREE.Vector2();
+      // initialize raycaster and mouse
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      const mouse2 = new THREE.Vector2();
 
-    document.addEventListener("mousemove", (event) => {
-        // calculate normalized device coordinates (-1 to 1) for mouse position
-        const rect = container.getBoundingClientRect();
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      document.addEventListener("mousemove", (event) => {
+          // calculate normalized device coordinates (-1 to 1) for mouse position
+          const rect = container.getBoundingClientRect();
+          mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-        // set the cursor style to 'pointer' if an object is being hovered over
-        raycaster.setFromCamera(mouse, this.camera);
-        // const intersects = raycaster.intersectObjects(scene.children);
-        const intersects = raycaster.intersectObjects([
-        mesh,
-        ]); // check for both cubes
-        if (intersects.length > 0) {
-          if (
-            intersects[0].object === mesh &&
-            mesh.visible == true
-          ) {
-            document.body.style.cursor = "pointer";
+          // set the cursor style to 'pointer' if an object is being hovered over
+          raycaster.setFromCamera(mouse, this.camera);
+          // const intersects = raycaster.intersectObjects(scene.children);
+          const intersects = raycaster.intersectObjects([CardUnit72, CardUnit74]); // check for both cubes
+          if (intersects.length > 0) {
+            if (
+              intersects[0].object === CardUnit72 || intersects[0].object === CardUnit74
+            ) {
+              document.body.style.cursor = "pointer";
+            }
+          } else {
+            document.body.style.cursor = "default";
           }
-        } else {
-          document.body.style.cursor = "default";
+
+        });
+
+      // add event listener to container for mouse click
+      document.addEventListener("click", async (event) => {
+        // calculate normalized device coordinates (-1 to 1) for mouse2 position
+        const rect = container.getBoundingClientRect();
+        mouse2.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse2.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        // set the cursor style to 'default' after the click
+        document.body.style.cursor = "default";
+
+        // update the raycaster with the mouse2 position
+        raycaster.setFromCamera(mouse2, this.camera);
+
+        // get the intersecting object(s)
+        const intersects = raycaster.intersectObjects([CardUnit72, CardUnit74]); // check for both cubes
+
+        // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
+        if (intersects.length > 0) {
+          if (intersects[0].object === CardUnit72 && this.IsAble) {
+            console.log("Click img Option1");
+            this.goToWordsUnit7();
+          }
+          if (intersects[0].object === CardUnit74 && this.IsAble) {
+            console.log("Click img Option2");
+          }
         }
       });
-
-    // add event listener to container for mouse click
-    document.addEventListener("click", (event) => {
-      // calculate normalized device coordinates (-1 to 1) for mouse2 position
-      const rect = container.getBoundingClientRect();
-      mouse2.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse2.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      // set the cursor style to 'default' after the click
-      this.$refs.container.style.cursor = "default";
-
-      // update the raycaster with the mouse2 position
-      raycaster.setFromCamera(mouse2, this.camera);
-
-      // get the intersecting object(s)
-      // const intersects = raycaster.intersectObjects([imageexitForClick]); // check for both cubes
-
-      // // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
-      // if (intersects.length > 0) {
-      //   if (
-      //     intersects[0].object === imageexitForClick &&
-      //     imageexitForClick.visible == true
-      //   ) {
-      //     imageexitForClick.visible == false;
-      //     this.backtoCate();
-      //   }
-      // }
-    });
 
     // render the scene
     const render = () => {
       requestAnimationFrame(render);
+      if (this.isListening){
+        let bufferLength = this.analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
+        this.analyser.getByteFrequencyData(dataArray);
+        const level = Math.max.apply(null, dataArray);
+        this.scaleBgMic = level / 150;
+        console.log("isListening", true);
+      }
 
       const currentTime = Date.now();
       if (currentTime - lastFrameTime > frameDuration) {
         lastFrameTime = currentTime;
 
         // Update texture
-        frameIndex = (frameIndex + 1) % textures.length;
-        mesh.material.map = textures[frameIndex];
-        mesh.material.needsUpdate = true;
+        // frameIndex = (frameIndex + 1) % this.textures.length;
+        // cardOpt1.material.map = textures[frameIndex];
+        // cardOpt1.material.needsUpdate = true;
       }
+
+      CardUnit71.scale.set(this.scaleUnit71, this.scaleUnit71);
+      CardUnit71.material.opacity = this.opacityAll;
+
+      CardUnit72.scale.set(this.scaleUnit72, this.scaleUnit72);
+      CardUnit72.material.opacity = this.opacityAll;
+
+      CardUnit73.scale.set(this.scaleUnit73, this.scaleUnit73);
+      CardUnit73.material.opacity = this.opacityAll;
+
+      CardUnit74.scale.set(this.scaleUnit72, this.scaleUnit72);
+      CardUnit74.material.opacity = this.opacityAll;
+
+      CardUnit75.scale.set(this.scaleUnit73, this.scaleUnit73);
+      CardUnit75.material.opacity = this.opacityAll;
 
 
       // Smoothly move the camera along the X-axis
       this.camera.position.x += (-cameraX - this.camera.position.x) * 0.05;
       this.camera.position.z += (-cameraZ - this.camera.position.z) * 0.05;
       this.camera.position.y += (-cameraY - this.camera.position.y) * 0.1;
-
-      if (this.moveLeft || keyboard["ArrowLeft"]) {
-        cameraX += this.speedCameraX;
-      }
-      if (this.moveRight || keyboard["ArrowRight"]) {
-        cameraX -= this.speedCameraX;
-      }
-
       if (cameraX >= 0 || cameraX <= 0) {
         cameraX = 0;
       }
@@ -297,58 +314,46 @@ export default {
       this.camera.updateProjectionMatrix();
     });
 
+
   },
   methods: {
-    AnimationStart() {
-      setTimeout(() => {
-        gsap.to(this.$data, {
-          duration: 1,
-          elOpty: 1,
-          ease: "power2.out",
-        });
-        gsap.to(this.$data, {
-          duration: 1,
-          hdttOpty: 1,
-          ease: "power2.out",
-        });
+    async setTextures(data, path, containerName) {
+      console.log("###setTextures");
+      const textureLoader = new THREE.TextureLoader();
+      this[data].forEach(item => {
+        const imgPath = require('@/assets/' + path + item.img);
+        const texture = textureLoader.load(imgPath);
+        texture.encoding = THREE.sRGBEncoding;
+        this[containerName].push(texture);
+      });
 
-        gsap.to(".sub-sub-container-rl", {
-          duration: 1,
-          opacity: 1,
-          ease: "power2.out",
-        });
-      }, 2000);
+      console.log("setTextures",this[data]);
+      console.log("setTextures Complete");
     },
-    backtoCate() {
-      gsap.to(this.camera.position, {
-        x: 40,
-        z: -7,
-        duration: 2,
-        ease: "elastic.out(1, 1)",
-      });
-      gsap.to(this.camera.position, {
-        z: -9,
-        delay: 1,
-        duration: 2,
-        ease: "elastic.out(1, 1)",
-        onComplete: () => {
-          this.$router.push("/Home");
-        },
-      });
 
-      gsap.to(this.$data, {
-        exitdoorX: 39.93,
-        duration: 2,
-        ease: "elastic.out(1, 1)",
+    async GetPlayerName(){
+    this.playerName = await JSON.parse(sessionStorage.getItem('playerName')) || '';
+    },
+
+    animatestart() {
+      window.addEventListener("load", (event) => {
+        if (event.target.readyState === "complete") {
+          gsap.to(this.$data, {
+            duration: 2,
+            opacityAll: 1,
+          });
+          gsap.to('.label', {
+            duration: 2,
+            opacity: 1,
+          });
+        }
       });
     },
-    PlayNavi() {
-      const tl = gsap.timeline({ repeat: -1 });
 
-      tl.to(this.$data, { duration: 2, nviOpty: 1 })
-        .to(this.$data, { duration: 2, nviOpty: 1 })
-        .to(this.$data, { duration: 2, nviOpty: 0 })
-        .to(this.$data, { duration: 1, nviOpty: 0 });
+    goToWordsUnit7() {
+      let isRestartNewGame = true;
+      sessionStorage.setItem('isRestartNewGame', JSON.stringify(isRestartNewGame));
+      this.$router.push("/SportsAndGameWords");
     },
   },
 };
@@ -362,6 +367,7 @@ export default {
     justify-content: center;
     width: 100%;
     height: 12%;
+    opacity: 0;
     /* background-color: rgba(197, 111, 111, 0.342); */
 }
 .txtArea{
@@ -375,8 +381,8 @@ export default {
 }
 .txt{
     color: white;
-    font-size: 1.2vw;
-    font-family:"K2D", sans-serif;
+    font-size: 1.5vw;
+    font-family:"balloo tamma", sans-serif;
     font-weight: 500;
 }
 
@@ -394,16 +400,6 @@ export default {
   height: 100%;
   z-index: 100;
 }
-
-.image_home {
-  width: 100%;
-  height: 100%;
-}
-
-.effect-hot-spot .home-wrap .navHP {
-  cursor: pointer;
-}
-
 .home-wrap {
   position: absolute;
   top: 0;
@@ -416,84 +412,14 @@ export default {
   width: 100%;
   height: 100%;
 }
-
-.no-select {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  outline: none;
-  border: none;
-}
-
-.sub-container-rl {
+.gesture {
   position: absolute;
   height: 100%;
   width: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-direction: column;
 }
-.gesture {
-  height: 100%;
-  width: 100%;
-}
-.sub-sub-container-rl {
-  bottom: 0;
-  position: sticky;
-  position: -webkit-sticky;
 
-  padding-right: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 10%;
-  width: 100%;
-  overflow: hidden;
+.animateOpacity{
   opacity: 0;
 }
-.messagebtn {
-  height: auto;
-  width: 40%;
 
-  font-size: 0.9vw;
-  font-family: "Prompt", sans-serif;
-}
-.rlbtn {
-  margin-left: 3%;
-  height: 100%;
-  width: 12%;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  z-index: 102;
-
-  -webkit-touch-callout: none;
-  -ms-touch-action: none;
-  touch-action: none;
-}
-
-
-.sub-rlbtn {
-  position: relative;
-  width: 50%;
-  height: 50%;
-  background-size: contain;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-.sub-rlbtn img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: scale-down;
-}
-
-.sub-rlbtn:hover {
-  -webkit-filter: invert(50%); /* Safari 6.0 - 9.0 */
-  filter: invert(50%);
-}
 </style>

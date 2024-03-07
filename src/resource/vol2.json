@@ -2,7 +2,7 @@
     "volList": [
       {
         "guid": 0,
-        "img": "vol2_2.png"
+        "img": "vol2_1.png"
       },
       {
         "guid": 1,
@@ -10,7 +10,7 @@
       },
       {
         "guid": 2,
-        "img": "vol2_2.png"
+        "img": "vol2_3.png"
       }
     ]
   }

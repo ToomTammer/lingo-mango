@@ -1,5 +1,17 @@
 <template>
   <div id="fullscreen-body">
+    <div v-if="!shouldDisplayContent" class="rotate-message">
+      <div class="gifRotate">
+        <img
+          src="@/assets/rotate-your-smartphone.gif"
+          alt="Rotate-GIF"
+          draggable="false"
+        />
+      </div>
+      <div class="messageRotate">
+        Please rotate your device for better display
+      </div>
+    </div>
     <div
       id="flexible-fullscreen-body"
       :style="{ height: windowHeight + 'px', width: windowWidth + 'px' }"
@@ -13,8 +25,8 @@
         <div id="frame">
             <div class="container-nav">
               <div class="sub-container-nav">
-                <div class="sub-sub-container-nav">
-                  <div class="navleft">
+                <div v-if="!isFinalGame" class="sub-sub-container-nav">
+                  <!-- <div class="navleft">
                     <a
                       href="https://forms.gle/uriQDdGjLxBygpgn9"
                       target="_blank"
@@ -29,7 +41,7 @@
                         ondragstart="return false;"
                       />
                     </a>
-                  </div>
+                  </div> -->
                   <div class="navright">
                     <a @click="playMusic" class="Nav margin-nav"
                       ><img
@@ -42,8 +54,8 @@
                         "
                         alt="Play/Pause"
                     /></a>
-
                     <router-link
+                      v-if="!isGame && !isHome"
                       to="/Home"
                       class="Nav margin-nav"
                       draggable="false"
@@ -53,6 +65,9 @@
                         alt="Home"
                         draggable="false"
                     /></router-link>
+                    <a v-if="isGame" @click="toggleMenuForGame"  draggable="false" class="Nav margin-nav"
+                      ><img src="@/assets/exit_btn.png" alt="Exit" draggable="false" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -66,15 +81,20 @@
 <script>
 import { Howl } from "howler";
 // import { gsap } from "gsap";
+import HomeMusic from '@/assets/music/home.mp3';
+import SportAndGameMusic from '@/assets/music/playful.mp3';
 
 export default {
-  components: {
-  },
   data() {
     return {
+      isFinalGame: false,
       isPlaying: true,
+      MasterPlaying: true,
+      isListening: false,
       shownav: true,
       music: null,
+      isGame: false,
+      isHome: true,
       btnAudio: {
         playNav: "vol_open",
         muteNav: "vol_close",
@@ -86,18 +106,9 @@ export default {
       shownavAbs: true,
       windowHeight: 0,
       windowWidth: 0,
-      // audefault: "https://d2ve0urukvvel8.cloudfront.net/Gymnopedie.mp3",
-      // auCr: "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/CrusadeWar/LamentoV2.mp3",
-      // auGP: "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/GrecoPersianWar/AdagioInGMinorV2.mp3",
-      // auHun:
-      //   "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/HundredYearsWar/PavaneV2.mp3",
-      // auww1:
-      //   "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/WorldWarI/NimrodV2.mp3",
-      // auww2:
-      //   "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/WorldWarII/AshokanFarewellV2.mp3",
-      // aukr: "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/KoreanWar/ArirangV2.mp3",
-      // auvn: "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/VietnamWar/LessLikelyV2.mp3",
-      // auru: "https://d2ve0urukvvel8.cloudfront.net/Contents/wars/RussiaUkraineWar/exileV2.mp3",
+      currentMusic:null,
+      audefault:HomeMusic,
+      SportAndGameMusic:SportAndGameMusic,
     };
   },
   created() {
@@ -106,6 +117,22 @@ export default {
   },
 
   mounted() {
+    //Event
+    this.emitter.on("stopBGMusic", (bool) => {
+      if(bool){
+          if (this.music && this.music.playing()) {
+          this.isPlaying = false;
+          this.music.pause();
+        }
+      }
+
+    });
+
+    this.emitter.on("SentFinal", (bool) => {
+      this.isFinalGame = bool;
+
+    });
+
     // Check the initial screen orientation
     this.checkOrientation();
 
@@ -121,10 +148,12 @@ export default {
     const musicPlaying = localStorage.getItem("musicPlaying");
     if (musicPlaying === "true") {
       this.loadMusic(this.audefault);
+      this.MasterPlaying = true;
       this.isPlaying = true;
     } else {
       localStorage.setItem("musicPlaying", "false"); // Set default value if not present in local storage
       this.isPlaying = false;
+      this.MasterPlaying = false;
     }
   },
   beforeUnmount() {
@@ -138,30 +167,46 @@ export default {
     // Watch for changes to the route and load the appropriate music
     $route(to) {
       switch (to.path) {
-        // case "/":
-        //   this.loadMusic(au1);
-        //   break;
-        case "/Home":
-          this.loadMusic(this.audefault);
-          this.shownav = true;
-          this.shownavHome = false;
-          this.shownavthx = true;
-          this.shownavAbs = true;
-
+        case "/":{
+          this.loadMusic(this.2);
+          this.isGame = false;
+          this.isHome = true;
           break;
-        default:
+        }
+        case "/Home":{
           this.loadMusic(this.audefault);
-          this.shownav = false;
-          this.shownavHome = false;
-          this.shownavthx = false;
-          this.shownavAbs = false;
+          this.isGame = false;
+          this.isHome = true;
           break;
+        }
+        case "/Category":{
+          this.loadMusic(this.SportAndGameMusic);
+          this.isGame = false;
+          this.isHome = false;
+          break;
+        }  
+        case "/SportsAndGameWords":{
+          this.loadMusic(this.SportAndGameMusic);
+          this.isGame = true;
+          this.isHome = false;
+          let lessonGuid = "unit07";
+          sessionStorage.setItem('lessonGuid', JSON.stringify(lessonGuid));
+          break;
+        }
+        default:{
+          this.isGame = false;
+          break;
+        }
       }
     },
   },
   methods: {
+    toggleMenuForGame() {
+      this.emitter.emit("toggleMenuForGame", true);
+    },
+
     checkOrientation() {
-      // Check if the screen is wider than it is tall
+      // Check if the screen is wider than it is tall 
       this.shouldDisplayContent = window.innerWidth > window.innerHeight;
     },
     handleResize() {
@@ -198,29 +243,40 @@ export default {
       // this.isPlaying = !this.isPlaying;
       // If music is playing, pause it
       if (this.music && this.music.playing()) {
-        this.isPlaying = false;
-        this.music.fade(this.music.volume(), 0, 1000);
-        this.music.once("fade", () => {
-          this.music.pause();
+          this.isPlaying = false;
+          this.MasterPlaying = false;
+          this.music.fade(this.music.volume(), 0, 1000);
+          this.music.once("fade", () => {
+            this.music.pause();
 
-          localStorage.setItem("musicPlaying", "false"); // Store the state in local storage
-        });
-      } else {
-        // If music is paused or not loaded, play it
-        if (this.music) {
-          this.isPlaying = true;
-          this.music.fade(0, 1, 2000);
-          this.music.play();
-
-          localStorage.setItem("musicPlaying", "true"); // Store the state in local storage
+            localStorage.setItem("musicPlaying", "false"); // Store the state in local storage
+          });
         } else {
-          this.loadMusic(this.audefault);
-          localStorage.setItem("musicPlaying", "true"); // Store the state in local storage
+          // If music is paused or not loaded, play it
+          if (this.music) {
+            if(this.currentMusic === this.audefault){
+              this.isPlaying = true;
+              this.MasterPlaying = true;
+              this.music.fade(0, 1, 2000);
+              this.music.play();
+            }else{
+              this.isPlaying = true;
+              this.MasterPlaying = true;
+              this.music.fade(0, 0.2, 2000);
+              this.music.play();
+            }
+
+            localStorage.setItem("musicPlaying", "true"); // Store the state in local storage
+          } else {
+            this.loadMusic(this.audefault);
+            localStorage.setItem("musicPlaying", "true"); // Store the state in local storage
+          }
         }
-      }
+      
     },
 
     loadMusic(src) {
+      this.currentMusic = src;
       // If default music is already loaded, do not load it again
       if (src === this.audefault && this.defaultMusicLoaded) {
         return;
@@ -233,12 +289,22 @@ export default {
       const musicPlaying = localStorage.getItem("musicPlaying");
       const shouldPlayMusic = musicPlaying === "true";
 
-      this.music = new Howl({
-        src: [src],
-        loop: true,
-        autoplay: shouldPlayMusic,
-        // volume: 0.5,
-      });
+      if(src === this.audefault){
+        this.music = new Howl({
+          src: [src],
+          loop: true,
+          autoplay: shouldPlayMusic,
+          volume: 0.4,
+        });
+      }else{
+        this.music = new Howl({
+          src: [src],
+          loop: true,
+          autoplay: shouldPlayMusic,
+          volume: 0.2,
+        });
+      }
+      
 
       if (shouldPlayMusic) {
         this.music.play();
@@ -249,48 +315,29 @@ export default {
         this.defaultMusicLoaded = true;
       }
     },
-    // requestPermission() {
-    //   if (typeof window.DeviceMotionEvent.requestPermission === "function") {
-    //     window.DeviceMotionEvent.requestPermission()
-    //       .then((permissionState) => {
-    //         if (permissionState === "granted") {
-    //           console.log("Motion permission granted");
-    //         }
-    //       })
-    //       .catch(console.error);
-    //   }
-    //   if (
-    //     typeof window.DeviceOrientationEvent.requestPermission === "function"
-    //   ) {
-    //     window.DeviceOrientationEvent.requestPermission()
-    //       .then((permissionState) => {
-    //         if (permissionState === "granted") {
-    //           console.log("Orientation permission granted");
-    //         }
-    //       })
-    //       .catch(console.error);
-    //   }
-    // },
   },
 };
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'); */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family:"balloo tamma", sans-serif;
+  outline: none;
 }
 *:focus {
   outline: none;
 }
 
+
 #fullscreen-body {
   margin: 0px;
   position: fixed;
   width: 100vw;
-  height: 100vh;
+  height: 100lvh;
   overflow: hidden;
 }
 
@@ -304,6 +351,7 @@ export default {
 
 #layout {
   position: relative;
+  
 }
 
 .canvas-bg {
@@ -350,8 +398,8 @@ export default {
   position: -webkit-sticky;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 12%;
+  justify-content: flex-end;
+  height: 15%;
   width: 100%;
 }
 
@@ -363,6 +411,7 @@ export default {
   align-items: center;
   justify-content: flex-end;
   margin-right: 5%;
+  gap: 20px;
 }
 
 .navright a:focus {
@@ -393,9 +442,7 @@ export default {
   -ms-touch-action: none;
   touch-action: none;
 }
-.margin-nav {
-  margin-left: 10%;
-}
+
 .Nav img {
   width: auto;
   height: 100%;
