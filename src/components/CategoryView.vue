@@ -333,6 +333,7 @@ export default {
 
     async GetPlayerName(){
     this.playerName = await JSON.parse(sessionStorage.getItem('playerName')) || '';
+    this.resetLocalStorageIfExceedsLimit();
     },
 
     animatestart() {
@@ -355,6 +356,17 @@ export default {
       sessionStorage.setItem('isRestartNewGame', JSON.stringify(isRestartNewGame));
       this.$router.push("/SportsAndGameWords");
     },
+    resetLocalStorageIfExceedsLimit() {
+      const allPlayerData2 = JSON.parse(localStorage.getItem('allPlayerData')) || [];
+      allPlayerData2.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+      while (allPlayerData2.length > 7) {
+        allPlayerData2.shift(); 
+      }
+
+      localStorage.setItem('allPlayerData', JSON.stringify(allPlayerData2));
+    },
+
   },
 };
 </script>

@@ -116,7 +116,7 @@ export default {
     this.handleResize();
   },
 
-  mounted() {
+  async mounted() {
     //Event
     this.emitter.on("stopBGMusic", (bool) => {
       if(bool){
@@ -147,7 +147,7 @@ export default {
     // Load the default music
     const musicPlaying = localStorage.getItem("musicPlaying");
     if (musicPlaying === "true") {
-      this.loadMusic(this.audefault);
+      await this.loadMusic(this.audefault);
       this.MasterPlaying = true;
       this.isPlaying = true;
     } else {
@@ -165,32 +165,46 @@ export default {
   },
   watch: {
     // Watch for changes to the route and load the appropriate music
-    $route(to) {
+    async $route(to) {
       switch (to.path) {
         case "/":{
-          this.loadMusic(this.2);
+          await this.loadMusic(this.audefault);
           this.isGame = false;
           this.isHome = true;
           break;
         }
         case "/Home":{
-          this.loadMusic(this.audefault);
+          await this.loadMusic(this.audefault);
           this.isGame = false;
           this.isHome = true;
           break;
         }
         case "/Category":{
-          this.loadMusic(this.SportAndGameMusic);
+          await this.loadMusic(this.audefault);
           this.isGame = false;
           this.isHome = false;
           break;
         }  
         case "/SportsAndGameWords":{
-          this.loadMusic(this.SportAndGameMusic);
+          await this.loadMusic(this.SportAndGameMusic);
           this.isGame = true;
           this.isHome = false;
           let lessonGuid = "unit07";
           sessionStorage.setItem('lessonGuid', JSON.stringify(lessonGuid));
+          break;
+        }
+        case "/SportsAndGameConversation":{
+          await this.loadMusic(this.SportAndGameMusic);
+          this.isGame = true;
+          this.isHome = false;
+          let lessonGuid = "unit0121";
+          sessionStorage.setItem('lessonGuid', JSON.stringify(lessonGuid));
+          break;
+        }
+        case "/Report":{
+          await this.loadMusic(this.audefault);
+          this.isGame = false;
+          this.isHome = false;
           break;
         }
         default:{
@@ -210,7 +224,7 @@ export default {
       this.shouldDisplayContent = window.innerWidth > window.innerHeight;
     },
     handleResize() {
-      this.windowHeight = window.innerHeight;
+      this.windowHeight = window.innerHeight ;
       this.windowWidth = window.innerWidth;
     },
     preserveAspect() {
@@ -337,7 +351,7 @@ export default {
   margin: 0px;
   position: fixed;
   width: 100vw;
-  height: 100lvh;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -459,6 +473,7 @@ export default {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  z-index: 1050;
 }
 .gifRotate {
   width: 30%;

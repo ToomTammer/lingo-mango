@@ -1,0 +1,106 @@
+[
+    {
+      "guid": "unit07-conversation",
+      "title" :"Sports And Games Words Conversation",
+      "questions": [
+        {
+          "guid": 0,
+          "title": "",
+          "is_multi": false,
+          "has_AddImg": false,
+          "questions": {
+            "qn": "what sport do you like to play?",
+            "voice": "word/voice/tap_pingpong.png",
+            "imgQn" :"",
+            "AddImg":""
+          },
+          "option": [
+            {
+              "imgOpt1": "word/voice/tap_pingpong.png",
+              "fullOpt1": "word/voice/tap_pingpong.png",
+              "msgOpt1": ["I like to play..."]
+            },
+            {
+              "imgOpt2": "",
+              "fullOpt2": "",
+              "msgOpt2": []
+            }
+          ]
+        },
+        {
+          "guid":1,
+          "title": "",
+          "is_multi": true,
+          "has_AddImg": false,
+          "questions": {
+            "qn": "Do you like to palt darts?",
+            "voice": "word/voice/tap_pingpong.png",
+            "imgQn" :"",
+            "AddImg":""
+          },
+          "option": [
+            {
+              "imgOpt1": "word/voice/tap_pingpong.png",
+              "fullOpt1": "word/voice/tap_pingpong.png",
+              "msgOpt1": ["Yes, I do.", "Yes, I do. I like to play darts."]
+            },
+            {
+              "imgOpt2": "",
+              "fullOpt2": "",
+              "msgOpt2": ["No, I don't.", "No, I do not.", "No, I don't. I like to play darts", "No, I do not. I like to play darts"]
+            }
+          ]
+        },
+        {
+          "guid":2,
+          "title": "",
+          "is_multi": false,
+          "has_AddImg": true,
+          "questions": {
+            "qn": "What is he doing?  ",
+            "voice": "word/voice/tap_pingpong.png",
+            "imgQn" :"",
+            "AddImg":""
+          },
+          "option": [
+            {
+              "imgOpt1": "word/voice/tap_pingpong.png",
+              "fullOpt1": "word/voice/tap_pingpong.png",
+              "msgOpt1": ["he is playing basketball."]
+            },
+            {
+              "imgOpt2": "",
+              "fullOpt2": "",
+              "msgOpt2": []
+            }
+          ]
+        },
+        {
+          "guid":3,
+          "title": "",
+          "is_multi": false,
+          "has_AddImg": true, 
+          "questions": {
+            "qn": "What is she doing?  ",
+            "voice": "word/voice/tap_pingpong.png",
+            "imgQn" :"",
+            "AddImg":""
+          },
+          "option": [
+            {
+              "imgOpt1": "word/voice/tap_pingpong.png",
+              "fullOpt1": "word/voice/tap_pingpong.png",
+              "msgOpt1": ["She is playing badminton."]
+            },
+            {
+              "imgOpt2": "",
+              "fullOpt2": "",
+              "msgOpt2": []
+            }
+          ]
+        }
+      ]
+    }
+    
+  ]
+  

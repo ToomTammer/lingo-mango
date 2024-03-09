@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../components/HomeView.vue'
 import GameWordView from '../components/GameWordView.vue'
-import Category from '../components/CategoryView.vue'
+import CategoryView from '../components/CategoryView.vue'
+import ReportView from '../components/ReportView.vue'
+import GameConversationView from '../components/GameConversationView.vue'
 // import PageLoader from '../views/PageLoader.vue'
 
 const routes = [
@@ -21,12 +23,22 @@ const routes = [
   {
     path: '/Category',
     name: 'Category',
-    component: Category
+    component: CategoryView
   },
   {
     path: '/SportsAndGameWords',
     name: 'SporstAndGameWords',
     component: GameWordView
+  },
+  {
+    path: '/Report',
+    name: 'Report',
+    component: ReportView
+  },
+  {
+    path: '/SportsAndGameConversation',
+    name: 'SportsAndGameConversation',
+    component: GameConversationView
   },
   
 ]

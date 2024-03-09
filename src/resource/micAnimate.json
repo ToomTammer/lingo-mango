@@ -13,8 +13,8 @@
         "img": "mic_open.png"
       },
       {
-        "guid": 2,
-        "img": "vol_close.png"
+        "guid": 3,
+        "img": "bgMic.png"
       }
     ]
   }

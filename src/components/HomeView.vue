@@ -1,8 +1,26 @@
 <template>
   <PageLoader />
+  <div v-if="!shouldDisplayContent" class="openVolumn-message">
+    <div class="VolRotate">
+      <img
+        src="@/assets/mingcute_volume-fill.png"
+        alt="Rotate-GIF"
+        draggable="false"
+      />
+    </div>
+    <div class="messageVol">
+      🔊 Open Volume for Full Gaming Experience! 🔊
+    </div>
+    <img
+        class="btn-message"
+        src="@/assets/okbtn.png"
+        alt="ok-botton"
+        draggable="false"
+        @click="openvolume"
+      />
+  </div>
   <div id="webglCanvas" ref="container"></div>
   <div class="effect-hot-spot">
-    <div class="loading-tips"></div>
     <div class="home-wrap">
       <div class="container-rl">
         <div class="container-rl">
@@ -34,6 +52,7 @@ export default {
   },
   data() {
     return {
+      shouldDisplayContent: false,
       isLogoComplete: false,
       isRestartNewGame : false,
       music: null,
@@ -85,7 +104,6 @@ export default {
     }
   },
   async mounted() {
-    this.animateLogo();
     await this.setTextures('imagesLogo','logo/','texturesLogo');
 
     window.addEventListener("load", (event) => {
@@ -360,22 +378,17 @@ export default {
     },
 
     animateLogo() {
-      console.log("###animateLogo");
-      window.addEventListener("load", (event) => {
-        if (event.target.readyState === "complete") {
-          const logoTimelines = [];
-          for (let i = 1; i <= 10; i++) {
-              const tl = gsap.timeline();
-              tl.to(this.$data, { delay: i * 0.1, duration: 0.5, [`LogoOpacity${i}`]: 1 })
-                .from(this.$data, { duration: 0.5, [`scaleLogo${i}`]: 0 })
-                .to(this.$data, { duration: 0.2, [`scaleLogo${i}`]: 1.2 });
-              logoTimelines.push(tl);
-          }
-          const lastTimeline = logoTimelines[logoTimelines.length - 1];
-          lastTimeline.eventCallback("onComplete", () => {
-            this.animateLogoLast();
-          });
-        }
+      const logoTimelines = [];
+      for (let i = 1; i <= 10; i++) {
+          const tl = gsap.timeline();
+          tl.to(this.$data, { delay: i * 0.1, duration: 0.5, [`LogoOpacity${i}`]: 1 })
+            .from(this.$data, { duration: 0.5, [`scaleLogo${i}`]: 0 })
+            .to(this.$data, { duration: 0.2, [`scaleLogo${i}`]: 1.2 });
+          logoTimelines.push(tl);
+      }
+      const lastTimeline = logoTimelines[logoTimelines.length - 1];
+      lastTimeline.eventCallback("onComplete", () => {
+        this.animateLogoLast();
       });
     },
 
@@ -403,6 +416,12 @@ export default {
         .to(this.$data, { duration: 2, nviOpty: 0 })
         .to(this.$data, { duration: 1, nviOpty: 0 });
     },
+
+    openvolume(){
+      this.shouldDisplayContent= true,
+      this.animateLogo();
+    },
+
   },
 };
 </script>
@@ -466,6 +485,42 @@ export default {
 
 .animateOpacity{
   opacity: 0;
+}
+
+.VolRotate {
+  width: 5%;
+  height: auto;
+}
+.VolRotate img {
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+}
+.messageVol {
+  margin-top: 2%;
+  color: white;
+  font-family: "Prompt", sans-serif;
+  font-size: 1.5vw;
+}
+
+.btn-message{
+  margin-top: 20px;
+  width: 5%;
+  height: auto;
+  cursor: pointer;
+}
+
+.openVolumn-message {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #32373a;
+  padding: 20px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 </style>

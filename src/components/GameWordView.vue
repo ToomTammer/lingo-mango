@@ -67,6 +67,8 @@
   import star from "@/assets/Star.png";
   import bgStar from "@/assets/bgStar.png";
   import winnerbg from "@/assets/music/winnerBgSound.mp3";
+  import reSfxCorrect from "@/assets/music/correct.mp3";
+  import eSfxWrong from "@/assets/music/wrong.mp3";
   
   import MsgFinalJson from '@/resource/MsgFinal.json';
 
@@ -92,6 +94,8 @@
         isFinal:false,
         winnerbg:winnerbg,
         musicWinner:null,
+        sfxCorrect:null,
+        sfxWrong:null,
 
         scoreForOneStar: 1,
         scoreForTwoStar: 3,
@@ -170,6 +174,7 @@
         vol2: vol2.volList,
         animateVol2:[],
         scaleVol2: 0.6,
+        scaleVol4: 0.5,
         textureVol2: 0,
 
         mics: mics.micList,
@@ -183,7 +188,7 @@
         hasAnimatedChangeQuestionVoice : false,
 
         scaleQ4: 1,
-        wordCheckForQMic: '',
+        wordCheckForQMic: [],
 
         allOpacity :1,
         star:star,
@@ -231,6 +236,8 @@
       await this.setTextures('mics','','animateMics');
       await this.setTextures('MsgFinalJson','','texturesMsgFinal');
       await this.GloballoadMusic(winnerbg,'musicWinner');
+      await this.GloballoadMusic(reSfxCorrect,'sfxCorrect');
+      await this.GloballoadMusic(eSfxWrong,'sfxWrong');
       // await this.setAudio('questions','/SportAndGame/word/voice/','texturesCardBG');
 
       this.IsExistPlayer =  await this.checkExistPlayerData();
@@ -254,6 +261,7 @@
         }
       }
       const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
+      
       this.uiNoOfQ = this.playerData.lesson[lessonIndex].game;
       await this.manageQuestionNo();
       await this.SetRandomAns();
@@ -438,6 +446,19 @@
       CardBGImag4.position.y = -0.15;
       scene.add(CardBGImag4);
 
+      // Vol4
+      const materialVol4 = new THREE.MeshBasicMaterial({
+        map: initialTextureVol2,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const btnVol4 = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleVol4, this.scaleVol4),
+        materialVol4);
+        btnVol4.position.y = -0.65;
+        btnVol4.position.x = -0.5;
+      scene.add(btnVol4);
+
       // BGbtnMic
       const materialBgMic = new THREE.MeshBasicMaterial({
         map: initialTextureBgbtnMic,
@@ -605,11 +626,11 @@
           // set the cursor style to 'pointer' if an object is being hovered over
           raycaster.setFromCamera(mouse, this.camera);
           // const intersects = raycaster.intersectObjects(scene.children);
-          const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic]); // check for both cubes
+          const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic, btnVol4]); // check for both cubes
           if (intersects.length > 0) {
             if (
               (intersects[0].object === CardBGOpt1 || intersects[0].object === CardBGOpt2 || intersects[0].object === CardBGOpt3
-              || intersects[0].object === btnVol2 || (intersects[0].object === btnMic && this.isVisibleSec2)
+              || intersects[0].object == btnVol2 || (intersects[0].object === btnMic && this.isVisibleSec2) || (intersects[0].object === btnVol4 && this.isVisibleSec2)
                 )&& this.IsAble && !this.isExitClicked) {
               document.body.style.cursor = "pointer";
             }
@@ -632,7 +653,7 @@
         raycaster.setFromCamera(mouse2, this.camera);
 
         // get the intersecting object(s)
-        const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic, CardBGImag4]); // check for both cubes
+        const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic, btnVol4]); // check for both cubes
 
         // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
         if (intersects.length > 0) {
@@ -655,7 +676,7 @@
           if (intersects[0].object === btnVol2 && this.IsAble && !this.isExitClicked) {
             this.playMusic();
           }
-          if (intersects[0].object === CardBGImag4 && this.IsAble && !this.isExitClicked && this.isVisibleSec2) {
+          if (intersects[0].object === btnVol4 && this.IsAble && !this.isExitClicked && this.isVisibleSec2) {
             this.playMusic();
           }
           if (intersects[0].object === btnMic && this.IsAble && this.isVisibleSec2 && !this.isExitClicked) {
@@ -673,7 +694,8 @@
           let dataArray = new Uint8Array(bufferLength);
           this.analyser.getByteFrequencyData(dataArray);
           const level = Math.max.apply(null, dataArray);
-          this.scaleBgMic = level / 5;
+          this.scaleBgMic = level/150;
+          console.log('this.scaleBgMic', this.scaleBgMic);
           if(this.scaleBgMic >= 1.3){
             this.scaleBgMic = 1.3;
           }
@@ -693,9 +715,13 @@
 
             btnVol2.material.map = this.animateVol2[frameIndexVol2];
             btnVol2.material.needsUpdate = true;
+            btnVol4.material.map = this.animateVol2[frameIndexVol2];
+            btnVol4.material.needsUpdate = true;
           }else{
             btnVol2.material.map = this.animateVol2[this.textureVol2];
             btnVol2.material.needsUpdate = true;
+            btnVol4.material.map = this.animateVol2[this.textureVol2];
+            btnVol4.material.needsUpdate = true;
           }
           // cardOpt1.material.map = textures[frameIndex];
           // cardOpt1.material.needsUpdate = true;
@@ -763,7 +789,7 @@
         bgBtnMic.material.needsUpdate = true;
         bgBtnMic.scale.set(this.scaleBgMic, this.scaleBgMic);
         bgBtnMic.visible = this.isVisibleSec2;
-        bgBtnMic.material.opacity = this.allOpacityStar;
+        bgBtnMic.material.opacity = this.allOpacity;
 
         BgStar.scale.set(this.scaleStar, this.scaleStar);
         BgStar.visible = true;
@@ -796,6 +822,10 @@
         msgFinal.material.opacity = this.OpacityMsgFinal;
 
         BgOFStar.material.opacity = this.OpacityngMsgFinal;
+
+        btnVol4.scale.set(this.scaleVol4, this.scaleVol4);
+        btnVol4.visible = this.isVisibleSec2;
+        btnVol4.material.opacity = this.allOpacity;
 
         // Smoothly move the camera along the X-axis
         this.camera.position.x += (-cameraX - this.camera.position.x) * 0.05;
@@ -961,6 +991,7 @@
         console.log("###checkExistPlayerData");
         this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
+        console.log("###currentPlayerIndex", currentPlayerIndex);
         if (currentPlayerIndex !== -1) {
           this.playerData = this.allPlayerData[currentPlayerIndex];
           return true;
@@ -1044,6 +1075,11 @@
       },
 
       async nextQuestion(point) {
+        if(point == 1){
+          this.sfxCorrect.play();
+        }else{
+          this.sfxWrong.play();
+        }
         console.log("###nextQuestion");
         this.IsAble = false;
         console.log("this.allPlayerData :", this.allPlayerData);
@@ -1053,23 +1089,26 @@
           this.playerData.lesson[lessonIndex].score += point;
 
           let question_no =  this.playerData.lesson[lessonIndex].question_no;
-          let logData = {
-            question : this.playerData.lesson[lessonIndex].game[question_no].title,
-            type: question_no != this.speakQNo ? "Multiple-choice" : "Speaking",
-            socre : point,
-          }
-          console.log('logData',logData);
-          let allLogData;
+          if(question_no != this.amountQ){
+            let logData = {
+              question : this.playerData.lesson[lessonIndex].game[question_no].title,
+              type: question_no != this.speakQNo ? "Multiple-choice" : "Speaking",
+              socre : point,
+            }
+            console.log('logData',logData);
+            let allLogData;
 
-          this.logDataEachQuestion.push(logData);
-          allLogData = {
-            playAt : new Date(),
-            data : this.logDataEachQuestion
+            this.logDataEachQuestion.push(logData);
+            allLogData = {
+              playAt : new Date(),
+              data : this.logDataEachQuestion
+            }
+            this.playerData.lesson[lessonIndex].question_no++;
+            this.playerData.lesson[lessonIndex].log = allLogData;
+            this.allPlayerData[currentPlayerIndex] = this.playerData;
           }
+           
           
-          this.playerData.lesson[lessonIndex].question_no++;
-          this.playerData.lesson[lessonIndex].log = allLogData;
-          this.allPlayerData[currentPlayerIndex] = this.playerData;
           console.log("###nextQuestion Update already");
           console.log("currentPlayer", this.allPlayerData[currentPlayerIndex]);
           localStorage.setItem('allPlayerData', JSON.stringify(this.allPlayerData));
@@ -1132,7 +1171,16 @@
           scaleOpt3: 0,
           onComplete: async () => {
             this.isVisibleSec1 = true;
-            this.voiceWord.stop();
+            if(this.voiceWord != null){
+              this.voiceWord.stop();
+            }
+            if(this.sfxCorrect != null){
+              this.sfxCorrect.stop();
+            }
+            if(this.sfxWrong != null){
+              this.sfxWrong.stop();
+            }
+
             await this.SetRandomAns();
             const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
             let question_no =  this.playerData.lesson[lessonIndex].question_no;
@@ -1176,7 +1224,15 @@
           scaleVol2: 0,
           onComplete: async () => {
             this.isVisibleSec1 = false;
-            this.voiceWord.stop();
+            if(this.voiceWord != null){
+              this.voiceWord.stop();
+            }
+            if(this.sfxCorrect != null){
+              this.sfxCorrect.stop();
+            }
+            if(this.sfxWrong != null){
+              this.sfxWrong.stop();
+            }
             await this.SetRandomAns();
           },
         })
@@ -1186,6 +1242,7 @@
           scaleQ4: 0,
           scaleMic: 0,
           scaleBgMic: 0,
+          scaleVol4: 0,
           ease: "bounce.out",
           onComplete: async () => {
             await this.playMusic();
@@ -1203,9 +1260,18 @@
           scaleQ4: 0,
           scaleMic: 0,
           scaleBgMic: 0,
+          scaleVol4: 0,
           onComplete: async () => {
             this.IsAble = false;
-            this.voiceWord.stop();
+            if(this.voiceWord != null){
+              this.voiceWord.stop();
+            }
+            if(this.sfxCorrect != null){
+              this.sfxCorrect.stop();
+            }
+            if(this.sfxWrong != null){
+              this.sfxWrong.stop();
+            }
             await this.SetRandomAns();
             const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
             let question_no =  this.playerData.lesson[lessonIndex].question_no;
@@ -1229,6 +1295,7 @@
           scaleQ4: 1,
           scaleMic: 0.6,
           scaleBgMic: 0.6,
+          scaleVol4: 0.5,
           ease: "bounce.out",
           onComplete: async () => {
             await this.playMusic();
@@ -1246,7 +1313,7 @@
           }
         
         this.isFinal = true
-        await this.seveData();
+        // await this.seveData();
         console.log("###animateFinalFirst");
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         let score =  this.playerData.lesson[lessonIndex].score;
@@ -1364,15 +1431,21 @@
             recognition.interimResults = false; // Get final results only
             // Set maximum length of recognized phrase
             const MAX_PHRASE_LENGTH = 10; // for example, allow phrases up to 5 words
-            recognition.onresult = (event) => { // Event handler when speech is recognized
+            recognition.onresult = async (event) => { // Event handler when speech is recognized
                 this.transcriptTracks = transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
                 words = transcript.split(' '); // Split transcript into words
                 console.log('Transcript:', transcript);
                 console.log('words:', words);
                 if (words.length >= MAX_PHRASE_LENGTH) {
-                  stopRecognition();
                     console.log('Phrase is too long. Ignoring.');
                 }
+                if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
+                    stopRecognition();
+                    await this.nextQuestion(1);
+                    await this.animateChangeQuestionVoice2();
+                }else{
+                  console.log("Wrong!!!!", this.wordCheckForQMic);
+                } 
             };
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
@@ -1386,17 +1459,6 @@
                 }
                 this.transcriptTracks = "...";
                 stopRecognition(); // Stop recognition when it naturally ends
-                // Check if the number of words is within the allowed threshold
-                if (words !== null && words.length <= MAX_PHRASE_LENGTH) {
-                    // Check if the transcript contains the specific words
-                    if (transcript.includes(this.wordCheckForQMic)) {
-                        console.log("currect!!!!", this.wordCheckForQMic);
-                        await this.nextQuestion(1);
-                        await this.animateChangeQuestionVoice2();
-                    }else{
-                      console.log("Wrong!!!!", this.wordCheckForQMic);
-                    } 
-                }
               };
 
             recognition.start(); // Start speech recognition
@@ -1522,7 +1584,7 @@
           localStorage.setItem('allPlayerData', JSON.stringify(this.allPlayerData));
 
         }
-      }
+      },
 
     },
   };
