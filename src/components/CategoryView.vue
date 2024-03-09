@@ -38,6 +38,8 @@ export default {
       music: null,
       IsAble : true,
       isloaded: false,
+      IsExistPlayer: false,
+      allPlayerData: null,
       imagesCateUnit7 : cateJson[0].unit7,
       texturesCateUnit7:[],
       textureCateUnit7No: 0,
@@ -46,6 +48,7 @@ export default {
       scaleUnit71: 1.5,
       scaleUnit72: 0.7,
       scaleUnit73: 0.7,
+      allUnit:[],
 
       sceneZ : -1,
       sceneY : 0,
@@ -64,6 +67,9 @@ export default {
   async mounted() {
     this.animatestart();
     await this.GetPlayerName();
+    this.IsExistPlayer =  await this.checkExistPlayerData();
+    console.log("###this.IsExistPlayer", this.IsExistPlayer);
+    await this.SetPlayerData();
     await this.setTextures('imagesCateUnit7','catagories/','texturesCateUnit7');
     console.log("imagesCateUnit7", this.imagesCateUnit7 );
 
@@ -250,7 +256,8 @@ export default {
             console.log("Click img Option1");
             this.goToWordsUnit7();
           }
-          if (intersects[0].object === CardUnit74 && this.IsAble) {
+          if (intersects[0].object === CardUnit74 && this.IsAble){
+            this.goToWordsUnit7Conversation();
             console.log("Click img Option2");
           }
         }
@@ -333,6 +340,7 @@ export default {
 
     async GetPlayerName(){
     this.playerName = await JSON.parse(sessionStorage.getItem('playerName')) || '';
+    console.log("###this.playerName", this.playerName);
     this.resetLocalStorageIfExceedsLimit();
     },
 
@@ -356,6 +364,13 @@ export default {
       sessionStorage.setItem('isRestartNewGame', JSON.stringify(isRestartNewGame));
       this.$router.push("/SportsAndGameWords");
     },
+
+    goToWordsUnit7Conversation() {
+      let isRestartNewGame = true;
+      sessionStorage.setItem('isRestartNewGame', JSON.stringify(isRestartNewGame));
+      this.$router.push("/SportsAndGameConversation");
+    },
+
     resetLocalStorageIfExceedsLimit() {
       const allPlayerData2 = JSON.parse(localStorage.getItem('allPlayerData')) || [];
       allPlayerData2.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -366,6 +381,32 @@ export default {
 
       localStorage.setItem('allPlayerData', JSON.stringify(allPlayerData2));
     },
+
+    async SetPlayerData() {
+        console.log("###SetPlayerData");
+        if(!this.IsExistPlayer){
+          this.playerData = {
+            name: this.playerName,
+            lesson: this.allUnit,
+            createdAt: new Date()
+          };
+          this.allPlayerData.push(this.playerData);
+            
+        }
+        localStorage.setItem('allPlayerData', JSON.stringify(this.allPlayerData));
+      },
+
+      async checkExistPlayerData(){
+        console.log("###checkExistPlayerData");
+        this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
+        console.log("this.allPlayerData ", this.allPlayerData );
+        const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name == this.playerName);
+        console.log("###currentPlayerIndex", currentPlayerIndex);
+        if (currentPlayerIndex !== -1) {
+          return true;
+        }
+        return false;
+      },
 
   },
 };

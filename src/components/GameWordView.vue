@@ -254,15 +254,19 @@
         console.log("allPlayerData : ", this.allPlayerData);
         console.log("this.playerData : ", this.playerData);
 
-        if(this.isRestartNewGame){
+        const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
+        console.log("lessonIndex : ", lessonIndex);
+        if(lessonIndex != -1){
+          this.uiNoOfQ = this.playerData.lesson[lessonIndex].game;
+        }
+
+        if(this.isRestartNewGame || lessonIndex == -1){
           console.log('this.questions.question',this.questions[GetlessonIndexFromQuestions].questions);
           await this.selectRandomItems(this.questions[GetlessonIndexFromQuestions].questions, this.amountQ);
           await this.SetPlayerData();
         }
       }
-      const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
       
-      this.uiNoOfQ = this.playerData.lesson[lessonIndex].game;
       await this.manageQuestionNo();
       await this.SetRandomAns();
       this.beforeStart();
@@ -963,10 +967,10 @@
           voice2: item.voice2,
           ans: item.ans
         }));
-
-        if(this.isRestartNewGame && this.IsExistPlayer){
+        
+        const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
+        if(this.isRestartNewGame && this.IsExistPlayer && lessonIndex != -1){
           console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
-          const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
           this.playerData.lesson[lessonIndex].game = this.selectedItems;
           this.playerData.lesson[lessonIndex].score = 0;
           this.playerData.lesson[lessonIndex].question_no = 0;
@@ -994,6 +998,7 @@
         console.log("###currentPlayerIndex", currentPlayerIndex);
         if (currentPlayerIndex !== -1) {
           this.playerData = this.allPlayerData[currentPlayerIndex];
+          this.allUnit = this.playerData.lesson;
           return true;
         }
         return false;
@@ -1092,7 +1097,7 @@
           if(question_no != this.amountQ){
             let logData = {
               question : this.playerData.lesson[lessonIndex].game[question_no].title,
-              type: question_no != this.speakQNo ? "Multiple-choice" : "Speaking",
+              type: question_no < this.speakQNo ? "Multiple-choice" : "Speaking",
               socre : point,
             }
             console.log('logData',logData);

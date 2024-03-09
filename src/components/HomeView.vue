@@ -27,7 +27,7 @@
           <div class="sub-container-rl">
             <div class="gesture" ref="containerVI"></div>
           </div>
-          <InputNameView class="animateOpacity" v-if="true"  @playerName="sessionStoragePlayerData" ></InputNameView>
+          <InputNameView class="animateOpacity" v-if="animateLogoComplete"  @playerName="sessionStoragePlayerData" ></InputNameView>
         </div>
       </div>
     </div>
@@ -59,6 +59,7 @@ export default {
       VoiceLoaded : false,
       isVoicePlaying : false,
       isloaded: false,
+      animateLogoComplete: false,
 
       playerName: '',
 
@@ -397,6 +398,7 @@ export default {
         duration: 1,
         sceneY: 0.3,
         sceneZ: -1.3,
+        animateLogoComplete : true,
         ease: "elastic.out(1, 1)",
         onComplete: async () => {
           gsap.to('.animateOpacity', { opacity: 1, duration: 0.5 });
