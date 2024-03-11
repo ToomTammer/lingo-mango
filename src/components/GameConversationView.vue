@@ -148,7 +148,7 @@
         textureCardOpt2: 0,
         textureCardOpt3: 0,
         isVisibleSec1 : false,
-        isVisibleSec2 : false,
+        isVisibleSec2 : true,
         textureCardOpt4: 0,
         textureImagVol2: 0,
         textures:[],
@@ -316,7 +316,7 @@
 
       // Animation variables
       let frameIndex = 0;
-      let frameIndexVol2 = 0;
+      // let frameIndexVol2 = 0;
       const frameDuration = 200; // Milliseconds per frame
       let lastFrameTime = 0;
 
@@ -329,140 +329,10 @@
       // });
       // Create a mesh with initial texture
       // const initialTexture = textures[0];
-      const initialTexture = this.textures[this.textureOpt1];
-      const initialTexture2 = this.textures[this.textureOpt2];
-      const initialTexture3 = this.textures[this.textureOpt3];
-      const initialTextureCardBG1 = this.texturesCardBG[this.textureCardOpt1];
-      const initialTextureCardBG2 = this.texturesCardBG[this.textureCardOpt2];
-      const initialTextureCardBG3 = this.texturesCardBG[this.textureCardOpt3];
-      const initialTextureVol2 = this.animateVol2[this.textureVol2];
-      const initialTextureImagVol2 = this.textures[this.textureImagVol2];
-      const initialTexturebtnMic = this.animateMics[this.textureMic];
       const initialTextureBgbtnMic = this.animateMics[this.texturebgMic];
+      const initialTexturebtnMic = this.animateMics[this.textureMic];
       const initialTextureMsgFinal = this.texturesMsgFinal[this.texturesMsgFinalNo];
 
-
-      // Vol2
-      const materialVol2 = new THREE.MeshBasicMaterial({
-        map: initialTextureVol2,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const btnVol2 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleVol2, this.scaleVol2),
-        materialVol2);
-        btnVol2.position.y = -0.55;
-      scene.add(btnVol2);
-
-      // CardBGOpt 1
-      const materialCardBG1 = new THREE.MeshBasicMaterial({
-        map: initialTextureCardBG1,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const CardBGOpt1 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt1, this.scaleOpt1),
-        materialCardBG1);
-      CardBGOpt1.position.x = -0.9;
-      scene.add(CardBGOpt1);
-
-      // CardOpt 1
-      const material1 = new THREE.MeshBasicMaterial({
-        map: initialTexture,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const imgOpt1 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt1 - this.scaleimag , this.scaleOpt1 - this.scaleimag),
-        material1);
-        imgOpt1.position.x = -0.9;
-      scene.add(imgOpt1);
-
-
-      // CardBGOpt 2
-      const materialCardBG2 = new THREE.MeshBasicMaterial({
-        map: initialTextureCardBG2,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const CardBGOpt2 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt2, this.scaleOpt2),
-        materialCardBG2);
-      scene.add(CardBGOpt2);
-
-      // imgOpt 2
-      const material2 = new THREE.MeshBasicMaterial({
-        map: initialTexture2,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const imgOpt2 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt2 - this.scaleimag, this.scaleOpt2 - this.scaleimag),
-        material2);
-      scene.add(imgOpt2);
-
-      // CardBGOpt 3
-      const materialCardBG3 = new THREE.MeshBasicMaterial({
-        map: initialTextureCardBG3,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const CardBGOpt3 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt3, this.scaleOpt3),
-        materialCardBG3);
-      CardBGOpt3.position.x = 0.9;
-      scene.add(CardBGOpt3);
-
-      // CardOpt 3
-      const material3 = new THREE.MeshBasicMaterial({
-        map: initialTexture3,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const imgOpt3 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleOpt3 - this.scaleimag, this.scaleOpt3 - this.scaleimag),
-        material3);
-      imgOpt3.position.x = 0.9;
-      scene.add(imgOpt3);
-
-      // CardBGOpt 4
-      const materialCardBG4 = new THREE.MeshBasicMaterial({
-        map: initialTextureCardBG1,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const CardBGOpt4 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleQ4, this.scaleQ4),
-        materialCardBG4);
-      CardBGOpt4.position.x = -0.5;
-      CardBGOpt4.position.y = -0.15;
-      scene.add(CardBGOpt4);
-
-      // CardBGOpt 5
-      const materialCardImag4 = new THREE.MeshBasicMaterial({
-        map: initialTextureImagVol2,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const CardBGImag4  = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleQ4 - 0.1, this.scaleQ4 - 0.1),
-        materialCardImag4);
-      CardBGImag4.position.x = -0.5;
-      CardBGImag4.position.y = -0.15;
-      scene.add(CardBGImag4);
-
-      // Vol4
-      const materialVol4 = new THREE.MeshBasicMaterial({
-        map: initialTextureVol2,
-        side:THREE.DoubleSide,
-        transparent: true,
-        opacity: 1 });
-      const btnVol4 = new THREE.Mesh(
-        new THREE.PlaneGeometry(this.scaleVol4, this.scaleVol4),
-        materialVol4);
-        btnVol4.position.y = -0.65;
-        btnVol4.position.x = -0.5;
-      scene.add(btnVol4);
 
       // BGbtnMic
       const materialBgMic = new THREE.MeshBasicMaterial({
@@ -631,12 +501,10 @@
           // set the cursor style to 'pointer' if an object is being hovered over
           raycaster.setFromCamera(mouse, this.camera);
           // const intersects = raycaster.intersectObjects(scene.children);
-          const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic, btnVol4]); // check for both cubes
+          const intersects = raycaster.intersectObjects([btnMic]); // check for both cubes
           if (intersects.length > 0) {
             if (
-              (intersects[0].object === CardBGOpt1 || intersects[0].object === CardBGOpt2 || intersects[0].object === CardBGOpt3
-              || intersects[0].object == btnVol2 || (intersects[0].object === btnMic && this.isVisibleSec2) || (intersects[0].object === btnVol4 && this.isVisibleSec2)
-                )&& this.IsAble && !this.isExitClicked) {
+              ((intersects[0].object === btnMic && this.isVisibleSec2))&& this.IsAble && !this.isExitClicked) {
               document.body.style.cursor = "pointer";
             }
           } else {
@@ -658,32 +526,10 @@
         raycaster.setFromCamera(mouse2, this.camera);
 
         // get the intersecting object(s)
-        const intersects = raycaster.intersectObjects([CardBGOpt1, CardBGOpt2, CardBGOpt3, btnVol2, btnMic, btnVol4]); // check for both cubes
+        const intersects = raycaster.intersectObjects([btnMic]); // check for both cubes
 
         // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
         if (intersects.length > 0) {
-          if (intersects[0].object === CardBGOpt1 && this.IsAble && !this.isExitClicked) {
-            await this.nextQuestion(this.opt1);
-            await this.animateAns(0);
-            await this.animateChangeQuestion();
-          }
-          if (intersects[0].object === CardBGOpt2 && this.IsAble && !this.isExitClicked) {
-            await this.nextQuestion(this.opt2);
-            await this.animateAns(1);
-            await this.animateChangeQuestion();
-          }
-          if (intersects[0].object === CardBGOpt3 && this.IsAble && !this.isExitClicked) {
-            console.log("Click img Option3", this.opt3);
-            await this.nextQuestion(this.opt3);
-            await this.animateAns(2);
-            await this.animateChangeQuestion();
-          }
-          if (intersects[0].object === btnVol2 && this.IsAble && !this.isExitClicked) {
-            this.playMusic();
-          }
-          if (intersects[0].object === btnVol4 && this.IsAble && !this.isExitClicked && this.isVisibleSec2) {
-            this.playMusic();
-          }
           if (intersects[0].object === btnMic && this.IsAble && this.isVisibleSec2 && !this.isExitClicked) {
             this.SpeechRecognition();
           }
@@ -715,74 +561,22 @@
 
           // Update texture
           frameIndex = (frameIndex + 1) % this.textures.length;
-          frameIndexVol2 = (frameIndex + 1) % this.animateVol2.length;
+          // frameIndexVol2 = (frameIndex + 1) % this.animateVol2.length;
           if(this.voiceWord != null && this.voiceWord.playing()){
 
-            btnVol2.material.map = this.animateVol2[frameIndexVol2];
-            btnVol2.material.needsUpdate = true;
-            btnVol4.material.map = this.animateVol2[frameIndexVol2];
-            btnVol4.material.needsUpdate = true;
+            // btnVol2.material.map = this.animateVol2[frameIndexVol2];
+            // btnVol2.material.needsUpdate = true;
+            // btnVol4.material.map = this.animateVol2[frameIndexVol2];
+            // btnVol4.material.needsUpdate = true;
           }else{
-            btnVol2.material.map = this.animateVol2[this.textureVol2];
-            btnVol2.material.needsUpdate = true;
-            btnVol4.material.map = this.animateVol2[this.textureVol2];
-            btnVol4.material.needsUpdate = true;
+            // btnVol2.material.map = this.animateVol2[this.textureVol2];
+            // btnVol2.material.needsUpdate = true;
+            // btnVol4.material.map = this.animateVol2[this.textureVol2];
+            // btnVol4.material.needsUpdate = true;
           }
           // cardOpt1.material.map = textures[frameIndex];
           // cardOpt1.material.needsUpdate = true;
         }
-
-
-        btnVol2.scale.set(this.scaleVol2, this.scaleVol2);
-        btnVol2.visible = this.isVisibleSec1;
-        btnVol2.material.opacity = this.allOpacity;
-
-        imgOpt1.material.map = this.textures[this.textureOpt1];
-        imgOpt1.material.needsUpdate = true;
-        imgOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
-        imgOpt1.visible = this.isVisibleSec1;
-        imgOpt1.material.opacity = this.allOpacity;
-        CardBGOpt1.material.map = this.texturesCardBG[this.textureCardOpt1];
-        CardBGOpt1.material.needsUpdate = true;
-        CardBGOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
-        CardBGOpt1.visible = this.isVisibleSec1;
-        CardBGOpt1.material.opacity = this.allOpacity;
-
-        imgOpt2.material.map = this.textures[this.textureOpt2];
-        imgOpt2.material.needsUpdate = true;
-        imgOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
-        imgOpt2.visible = this.isVisibleSec1;
-        imgOpt2.material.opacity = this.allOpacity;
-        CardBGOpt2.material.map = this.texturesCardBG[this.textureCardOpt2];
-        CardBGOpt2.material.needsUpdate = true;
-        CardBGOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
-        CardBGOpt2.visible = this.isVisibleSec1;
-        CardBGOpt2.material.opacity = this.allOpacity;
-
-        imgOpt3.material.map = this.textures[this.textureOpt3];
-        imgOpt3.material.needsUpdate = true;
-        imgOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
-        imgOpt3.visible = this.isVisibleSec1;
-        imgOpt3.material.opacity = this.allOpacity;
-        CardBGOpt3.material.map = this.texturesCardBG[this.textureCardOpt3];
-        CardBGOpt3.material.needsUpdate = true;
-        CardBGOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
-        CardBGOpt3.visible = this.isVisibleSec1;
-        CardBGOpt3.material.opacity = this.allOpacity;
-
-
-        CardBGOpt4.material.map = this.texturesCardBG[this.textureCardOpt3];
-        CardBGOpt4.material.needsUpdate = true;
-        CardBGOpt4.scale.set(this.scaleQ4, this.scaleQ4);
-        CardBGOpt4.visible = this.isVisibleSec2;
-        CardBGOpt4.material.opacity = this.allOpacity;
-        // CardBGOpt4.material.opacity = this.scaleQ4Opacity;
-
-        CardBGImag4.material.map = this.textures[this.textureImagVol2];
-        CardBGImag4.material.needsUpdate = true;
-        CardBGImag4.scale.set(this.scaleQ4, this.scaleQ4);
-        CardBGImag4.visible = this.isVisibleSec2;
-        CardBGImag4.material.opacity = this.allOpacity;
 
         btnMic.material.map = this.animateMics[this.textureMic];
         btnMic.material.needsUpdate = true;
@@ -827,10 +621,6 @@
         msgFinal.material.opacity = this.OpacityMsgFinal;
 
         BgOFStar.material.opacity = this.OpacityngMsgFinal;
-
-        btnVol4.scale.set(this.scaleVol4, this.scaleVol4);
-        btnVol4.visible = this.isVisibleSec2;
-        btnVol4.material.opacity = this.allOpacity;
 
         // Smoothly move the camera along the X-axis
         this.camera.position.x += (-cameraX - this.camera.position.x) * 0.05;
