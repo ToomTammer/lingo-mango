@@ -1449,19 +1449,16 @@
                     await this.nextQuestion(1);
                     await this.animateChangeQuestionVoice2();
                 }else{
-                  console.log("Wrong!!!!", this.wordCheckForQMic);
+                  this.countForSkip();
                 } 
             };
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
+                this.ShowBtnSkip = true;
                 stopRecognition(); // Stop recognition on error
             };
             recognition.onend = async () => {
                 console.log('Speech recognition ended.');
-                this.countSpeakingQ += 1;
-                if(this.countSpeakingQ >= 3){
-                  this.ShowBtnSkip = true;
-                }
                 this.transcriptTracks = "...";
                 stopRecognition(); // Stop recognition when it naturally ends
               };
@@ -1480,6 +1477,13 @@
           }
         } else {
           stopRecognition(); // Stop recognition if already listening
+        }
+      },
+
+      countForSkip(){
+        this.countSpeakingQ += 1;
+        if(this.countSpeakingQ >= 3){
+          this.ShowBtnSkip = true;
         }
       },
 

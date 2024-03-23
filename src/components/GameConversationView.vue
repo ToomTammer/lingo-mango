@@ -57,10 +57,12 @@
   import * as THREE from "three";
   import { Howl } from "howler";
   import PageLoader from "@/components/PageLoader.vue";
-  import answersJson from '@/resource/answer_word.json';
-  import questionJson from '@/resource/question_word.json';
+  import answersJson from '@/resource/answer_conversation.json';
+  import answersMsgJson from '@/resource/answer_conversation_msg.json';
+  import answersHintJson from '@/resource/answer_conversation_hint.json';
+  import questionJson from '@/resource/question_conversation.json';
   import CardSquare from '@/resource/cardSquare.json';
-  import vol2 from '@/resource/vol2.json';
+  import vol2 from '@/resource/vol3.json';
   import mics from '@/resource/micAnimate.json';
 
   import el2 from "@/assets/box1.png";
@@ -86,7 +88,7 @@
         IsExistPlayer:false,
         lessonGuid : "",
         amountQ : 5,
-        speakQNo: 3,
+        speakQNo: 0,
         isRestartNewGame : false,
         isListening : false,
         countSpeakingQ: 0,
@@ -148,11 +150,15 @@
         textureCardOpt2: 0,
         textureCardOpt3: 0,
         isVisibleSec1 : false,
-        isVisibleSec2 : true,
+        isVisibleSec2 : false,
         textureCardOpt4: 0,
         textureImagVol2: 0,
+        textureImagMsgVol2: 0,
+        CardBGHint:0,
         textures:[],
+        texturesMsg:[],
         texturesCardBG:[],
+        texturesCardBGHint:[],
         options : ['opt1', 'opt2', 'opt3'],
         imgOptions : ['textureOpt1', 'textureOpt2', 'textureOpt3'],
         speedCameraX: 0.03,
@@ -166,6 +172,8 @@
         uiNoOfQ:[],
         questions: questionJson,
         answers: answersJson.answers,
+        answersMsg: answersMsgJson.answers,
+        answersHintJson: answersHintJson.hints,
         allPlayerData:[],
         playerData:{},
         logDataEachQuestion:[],
@@ -174,20 +182,22 @@
         vol2: vol2.volList,
         animateVol2:[],
         scaleVol2: 0.6,
-        scaleVol4: 0.5,
+        scaleVol4: 0.4,
         textureVol2: 0,
 
         mics: mics.micList,
         animateMics:[],
         scaleMicDefault: 0.6,
         scaleMic: 0.6,
+        BgMicposY: -0.8,
         scaleBgMic: 0.6,
-        textureMic: 0,
+        textureMic: 4,
         texturebgMic: 3,
 
         hasAnimatedChangeQuestionVoice : false,
 
-        scaleQ4: 1,
+        scaleQ4: 1.5,
+        scaleCardMic:1.05,
         wordCheckForQMic: [],
 
         allOpacity :1,
@@ -213,7 +223,6 @@
       this.lessonGuid = await JSON.parse(sessionStorage.getItem('lessonGuid')) || null;
       const GetlessonIndexFromQuestions = await this.questions.findIndex(c => c.guid == this.lessonGuid);
       console.log('this.isRestartNewGame',this.isRestartNewGame);
-      console.log("this.lessonGuid : ", this.lessonGuid);
 
       ///set mic
       this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -231,7 +240,9 @@
       console.log("this.biquadFilter", this.biquadFilter);
       console.log("this.analyser", this.analyser);
 
-      await this.setTextures('answers','SportAndGame/word/img/','textures');
+      await this.setTextures('answers','SportAndGame/conversation/img/','textures');
+      await this.setTextures('answersMsg','SportAndGame/conversation/img/','texturesMsg');
+      await this.setTextures('answersHintJson','SportAndGame/conversation/img/','texturesCardBGHint');
       await this.setTextures('CardSquare','','texturesCardBG');
       await this.setTextures('vol2','','animateVol2');
       await this.setTextures('mics','','animateMics');
@@ -316,7 +327,7 @@
 
       // Animation variables
       let frameIndex = 0;
-      // let frameIndexVol2 = 0;
+      let frameIndexVol2 = 0;
       const frameDuration = 200; // Milliseconds per frame
       let lastFrameTime = 0;
 
@@ -329,10 +340,185 @@
       // });
       // Create a mesh with initial texture
       // const initialTexture = textures[0];
-      const initialTextureBgbtnMic = this.animateMics[this.texturebgMic];
+      // const initialTexture = this.textures[this.textureOpt1];
+      // const initialTexture2 = this.textures[this.textureOpt2];
+      // const initialTexture3 = this.textures[this.textureOpt3];
+      // const initialTextureCardBG1 = this.texturesCardBG[this.textureCardOpt1];
+      // const initialTextureCardBG2 = this.texturesCardBG[this.textureCardOpt2];
+      // const initialTextureCardBG3 = this.texturesCardBG[this.textureCardOpt3];
+      const initialTextureCardBgMic = this.texturesCardBG[4];
+      const initialTextureCardBGHint = this.texturesCardBGHint[this.CardBGHint];
+      const initialTextureVol2 = this.animateVol2[this.textureVol2];
+      const initialTextureImagVol2 = this.textures[this.textureImagVol2];
+      const initialTextureImagMsgVol2 = this.texturesMsg[this.textureImagMsgVol2];
       const initialTexturebtnMic = this.animateMics[this.textureMic];
+      const initialTextureBgbtnMic = this.animateMics[this.texturebgMic];
       const initialTextureMsgFinal = this.texturesMsgFinal[this.texturesMsgFinalNo];
 
+
+      // Vol2
+      const materialVol2 = new THREE.MeshBasicMaterial({
+        map: initialTextureVol2,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const btnVol2 = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleVol2, this.scaleVol2),
+        materialVol2);
+        btnVol2.position.y = -0.55;
+      scene.add(btnVol2);
+
+      // CardBGOpt 1
+      // const materialCardBG1 = new THREE.MeshBasicMaterial({
+      //   map: initialTextureCardBG1,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const CardBGOpt1 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt1, this.scaleOpt1),
+      //   materialCardBG1);
+      // CardBGOpt1.position.x = -0.9;
+      // scene.add(CardBGOpt1);
+
+      // // CardOpt 1
+      // const material1 = new THREE.MeshBasicMaterial({
+      //   map: initialTexture,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const imgOpt1 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt1 - this.scaleimag , this.scaleOpt1 - this.scaleimag),
+      //   material1);
+      //   imgOpt1.position.x = -0.9;
+      // scene.add(imgOpt1);
+
+
+      // // CardBGOpt 2
+      // const materialCardBG2 = new THREE.MeshBasicMaterial({
+      //   map: initialTextureCardBG2,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const CardBGOpt2 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt2, this.scaleOpt2),
+      //   materialCardBG2);
+      // scene.add(CardBGOpt2);
+
+      // // imgOpt 2
+      // const material2 = new THREE.MeshBasicMaterial({
+      //   map: initialTexture2,
+      //   side: THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const imgOpt2 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt2 - this.scaleimag, this.scaleOpt2 - this.scaleimag),
+      //   material2);
+      // scene.add(imgOpt2);
+
+      // // CardBGOpt 3
+      // const materialCardBG3 = new THREE.MeshBasicMaterial({
+      //   map: initialTextureCardBG3,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const CardBGOpt3 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt3, this.scaleOpt3),
+      //   materialCardBG3);
+      // CardBGOpt3.position.x = 0.9;
+      // scene.add(CardBGOpt3);
+
+      // // CardOpt 3
+      // const material3 = new THREE.MeshBasicMaterial({
+      //   map: initialTexture3,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const imgOpt3 = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt3 - this.scaleimag, this.scaleOpt3 - this.scaleimag),
+      //   material3);
+      // imgOpt3.position.x = 0.9;
+      // scene.add(imgOpt3);
+      
+     
+
+      // CardBGImag4 4
+      const materialCardImag4 = new THREE.MeshBasicMaterial({
+        map: initialTextureImagVol2,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 0 });
+      const CardBGImag4  = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleQ4 - 0.1, this.scaleQ4 - 0.1),
+        materialCardImag4);
+      CardBGImag4.position.x = -0.5;
+      CardBGImag4.position.y = -0.47;
+      scene.add(CardBGImag4);
+
+       // CardBGMsg 4
+       const materialCardBGMsg4 = new THREE.MeshBasicMaterial({
+        map: initialTextureImagMsgVol2,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 0 });
+      const CardCardBGMsg4  = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleQ4 - 0.1, this.scaleQ4 - 0.1),
+        materialCardBGMsg4);
+      CardCardBGMsg4.position.x = -0.5;
+      CardCardBGMsg4.position.y = -0.47;
+      scene.add(CardCardBGMsg4);
+
+      // Vol4
+      const materialVol4 = new THREE.MeshBasicMaterial({
+        map: initialTextureVol2,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const btnVol4 = new THREE.Mesh(
+        new THREE.PlaneGeometry(this.scaleVol4, this.scaleVol4),
+        materialVol4);
+        btnVol4.position.y = 0.36;
+        btnVol4.position.x = -1.06;
+      scene.add(btnVol4);
+        
+      // CardBgMic
+      const materialCardBG = new THREE.MeshBasicMaterial({
+        map: initialTextureCardBgMic,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const CardBgMic = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.5, 1.5),
+        materialCardBG);
+      CardBgMic.position.x = 0.5;
+      CardBgMic.position.y = this.BgMicposY;
+      scene.add(CardBgMic);
+
+      // CardBGHint
+      const materialCardBGHint = new THREE.MeshBasicMaterial({
+        map: initialTextureCardBGHint,
+        side:THREE.DoubleSide,
+        transparent: true,
+        opacity: 1 });
+      const CardBGHint = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.5, 1.5),
+        materialCardBGHint);
+      CardBGHint.position.x = 0.5;
+      CardBGHint.position.y = 0;
+      scene.add(CardBGHint);
+
+      
+
+      // // CardBgMic
+      // const materialCardBgMic = new THREE.MeshBasicMaterial({
+      //   map: initialTextureCardBG3,
+      //   side:THREE.DoubleSide,
+      //   transparent: true,
+      //   opacity: 1 });
+      // const CardBgMic = new THREE.Mesh(
+      //   new THREE.PlaneGeometry(this.scaleOpt3 - this.scaleimag, this.scaleOpt3 - this.scaleimag),
+      //   materialCardBgMic);
+      // CardBgMic.position.x = 0.5;
+      // scene.add(CardBgMic);
 
       // BGbtnMic
       const materialBgMic = new THREE.MeshBasicMaterial({
@@ -344,7 +530,7 @@
         new THREE.PlaneGeometry(this.scaleMic, this.scaleMic),
         materialBgMic);
         bgBtnMic.position.x = 0.5;
-        bgBtnMic.position.y = -0.15;
+        bgBtnMic.position.y = -0.55;
       scene.add(bgBtnMic);
 
       // btnMic
@@ -357,7 +543,7 @@
         new THREE.PlaneGeometry(this.scaleMic, this.scaleMic),
         materialMic);
         btnMic.position.x = 0.5;
-        btnMic.position.y = -0.15;
+        btnMic.position.y = -0.55;
       scene.add(btnMic);
 
       // BgOFStar
@@ -501,10 +687,11 @@
           // set the cursor style to 'pointer' if an object is being hovered over
           raycaster.setFromCamera(mouse, this.camera);
           // const intersects = raycaster.intersectObjects(scene.children);
-          const intersects = raycaster.intersectObjects([btnMic]); // check for both cubes
+          const intersects = raycaster.intersectObjects([btnVol2, btnMic, btnVol4]); // check for both cubes
           if (intersects.length > 0) {
             if (
-              ((intersects[0].object === btnMic && this.isVisibleSec2))&& this.IsAble && !this.isExitClicked) {
+              (intersects[0].object == btnVol2 || (intersects[0].object === btnMic && this.isVisibleSec2) || (intersects[0].object === btnVol4 && this.isVisibleSec2)
+                )&& this.IsAble && !this.isExitClicked) {
               document.body.style.cursor = "pointer";
             }
           } else {
@@ -526,10 +713,32 @@
         raycaster.setFromCamera(mouse2, this.camera);
 
         // get the intersecting object(s)
-        const intersects = raycaster.intersectObjects([btnMic]); // check for both cubes
+        const intersects = raycaster.intersectObjects([btnVol2, btnMic, btnVol4]); // check for both cubes
 
         // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
         if (intersects.length > 0) {
+          // if (intersects[0].object === CardBGOpt1 && this.IsAble && !this.isExitClicked) {
+          //   await this.nextQuestion(this.opt1);
+          //   await this.animateAns(0);
+          //   await this.animateChangeQuestion();
+          // }
+          // if (intersects[0].object === CardBGOpt2 && this.IsAble && !this.isExitClicked) {
+          //   await this.nextQuestion(this.opt2);
+          //   await this.animateAns(1);
+          //   await this.animateChangeQuestion();
+          // }
+          // if (intersects[0].object === CardBGOpt3 && this.IsAble && !this.isExitClicked) {
+          //   console.log("Click img Option3", this.opt3);
+          //   await this.nextQuestion(this.opt3);
+          //   await this.animateAns(2);
+          //   await this.animateChangeQuestion();
+          // }
+          if (intersects[0].object === btnVol2 && this.IsAble && !this.isExitClicked) {
+            this.playMusic();
+          }
+          if (intersects[0].object === btnVol4 && this.IsAble && !this.isExitClicked && this.isVisibleSec2) {
+            this.playMusic();
+          }
           if (intersects[0].object === btnMic && this.IsAble && this.isVisibleSec2 && !this.isExitClicked) {
             this.SpeechRecognition();
           }
@@ -546,7 +755,6 @@
           this.analyser.getByteFrequencyData(dataArray);
           const level = Math.max.apply(null, dataArray);
           this.scaleBgMic = level/150;
-          console.log('this.scaleBgMic', this.scaleBgMic);
           if(this.scaleBgMic >= 1.3){
             this.scaleBgMic = 1.3;
           }
@@ -561,22 +769,84 @@
 
           // Update texture
           frameIndex = (frameIndex + 1) % this.textures.length;
-          // frameIndexVol2 = (frameIndex + 1) % this.animateVol2.length;
+          frameIndexVol2 = (frameIndex + 1) % this.animateVol2.length;
           if(this.voiceWord != null && this.voiceWord.playing()){
 
-            // btnVol2.material.map = this.animateVol2[frameIndexVol2];
-            // btnVol2.material.needsUpdate = true;
-            // btnVol4.material.map = this.animateVol2[frameIndexVol2];
-            // btnVol4.material.needsUpdate = true;
+            btnVol2.material.map = this.animateVol2[frameIndexVol2];
+            btnVol2.material.needsUpdate = true;
+            btnVol4.material.map = this.animateVol2[frameIndexVol2];
+            btnVol4.material.needsUpdate = true;
           }else{
-            // btnVol2.material.map = this.animateVol2[this.textureVol2];
-            // btnVol2.material.needsUpdate = true;
-            // btnVol4.material.map = this.animateVol2[this.textureVol2];
-            // btnVol4.material.needsUpdate = true;
+            btnVol2.material.map = this.animateVol2[this.textureVol2];
+            btnVol2.material.needsUpdate = true;
+            btnVol4.material.map = this.animateVol2[this.textureVol2];
+            btnVol4.material.needsUpdate = true;
           }
           // cardOpt1.material.map = textures[frameIndex];
           // cardOpt1.material.needsUpdate = true;
         }
+
+
+        btnVol2.scale.set(this.scaleVol2, this.scaleVol2);
+        btnVol2.visible = this.isVisibleSec1;
+        btnVol2.material.opacity = this.allOpacity;
+
+        // imgOpt1.material.map = this.textures[this.textureOpt1];
+        // imgOpt1.material.needsUpdate = true;
+        // imgOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
+        // imgOpt1.visible = this.isVisibleSec1;
+        // imgOpt1.material.opacity = this.allOpacity;
+        // CardBGOpt1.material.map = this.texturesCardBG[this.textureCardOpt1];
+        // CardBGOpt1.material.needsUpdate = true;
+        // CardBGOpt1.scale.set(this.scaleOpt1, this.scaleOpt1);
+        // CardBGOpt1.visible = this.isVisibleSec1;
+        // CardBGOpt1.material.opacity = this.allOpacity;
+
+        // imgOpt2.material.map = this.textures[this.textureOpt2];
+        // imgOpt2.material.needsUpdate = true;
+        // imgOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
+        // imgOpt2.visible = this.isVisibleSec1;
+        // imgOpt2.material.opacity = this.allOpacity;
+        // CardBGOpt2.material.map = this.texturesCardBG[this.textureCardOpt2];
+        // CardBGOpt2.material.needsUpdate = true;
+        // CardBGOpt2.scale.set(this.scaleOpt2, this.scaleOpt2);
+        // CardBGOpt2.visible = this.isVisibleSec1;
+        // CardBGOpt2.material.opacity = this.allOpacity;
+
+        // imgOpt3.material.map = this.textures[this.textureOpt3];
+        // imgOpt3.material.needsUpdate = true;
+        // imgOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
+        // imgOpt3.visible = this.isVisibleSec1;
+        // imgOpt3.material.opacity = this.allOpacity;
+        // CardBGOpt3.material.map = this.texturesCardBG[this.textureCardOpt3];
+        // CardBGOpt3.material.needsUpdate = true;
+        // CardBGOpt3.scale.set(this.scaleOpt3, this.scaleOpt3);
+        // CardBGOpt3.visible = this.isVisibleSec1;
+        // CardBGOpt3.material.opacity = this.allOpacity;
+
+        CardBGHint.material.map = this.texturesCardBGHint[this.CardBGHint];
+        CardBGHint.material.needsUpdate = true;
+        CardBGHint.scale.set(this.scaleCardMic, this.scaleCardMic);
+        CardBGHint.visible = this.isVisibleSec2;
+        CardBGHint.material.opacity = this.allOpacity;
+
+        CardBgMic.material.map = this.texturesCardBG[4];
+        CardBgMic.material.needsUpdate = true;
+        CardBgMic.scale.set(this.scaleCardMic, this.scaleCardMic);
+        CardBgMic.visible = this.isVisibleSec2;
+        CardBgMic.material.opacity = this.allOpacity;
+
+        CardCardBGMsg4.material.map = this.texturesMsg[this.textureImagMsgVol2];
+        CardCardBGMsg4.material.needsUpdate = true;
+        CardCardBGMsg4.scale.set(this.scaleQ4, this.scaleQ4);
+        CardCardBGMsg4.visible = this.isVisibleSec2;
+        CardCardBGMsg4.material.opacity = this.allOpacity;
+
+        CardBGImag4.material.map = this.textures[this.textureImagVol2];
+        CardBGImag4.material.needsUpdate = true;
+        CardBGImag4.scale.set(this.scaleQ4, this.scaleQ4);
+        CardBGImag4.visible = this.isVisibleSec2;
+        CardBGImag4.material.opacity = this.allOpacity;
 
         btnMic.material.map = this.animateMics[this.textureMic];
         btnMic.material.needsUpdate = true;
@@ -621,6 +891,10 @@
         msgFinal.material.opacity = this.OpacityMsgFinal;
 
         BgOFStar.material.opacity = this.OpacityngMsgFinal;
+
+        btnVol4.scale.set(this.scaleVol4, this.scaleVol4);
+        btnVol4.visible = this.isVisibleSec2;
+        btnVol4.material.opacity = this.allOpacity;
 
         // Smoothly move the camera along the X-axis
         this.camera.position.x += (-cameraX - this.camera.position.x) * 0.05;
@@ -745,7 +1019,6 @@
           }
         }
         }
-       
       },
 
       async selectRandomItems(data, count) {
@@ -754,10 +1027,12 @@
         this.selectedItems = shuffled.slice(0, count).map(item => ({
           guid: item.guid,
           title: item.title,
+          ans_sentence: item.ans_sentence,
           voice1: item.voice1,
           voice2: item.voice2,
           ans: item.ans
         }));
+        
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         if(this.isRestartNewGame && this.IsExistPlayer && lessonIndex != -1){
           console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
@@ -799,6 +1074,7 @@
         if(this.isRestartNewGame && this.IsExistPlayer){
           const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
           this.allPlayerData[currentPlayerIndex] = this.playerData;
+            
         }else{
           this.playerData = {
             name: this.playerName,
@@ -834,21 +1110,23 @@
             await this.setAudio(this.playerData.lesson[lessonIndex].game[question_no], 'SportAndGame/', `voice${audio_no}`);
 
             if(question_no < this.speakQNo ){
-            this[correctImgOpt] = textures_no;
-            const answersToShuffle = this.answers.filter(answer => answer.guid != this.playerData.lesson[lessonIndex].game[question_no].ans.guid);
-            const selectedItems_other = answersToShuffle.sort(() => 0.5 - Math.random());
+              this[correctImgOpt] = textures_no;
+              const answersToShuffle = this.answers.filter(answer => answer.guid != this.playerData.lesson[lessonIndex].game[question_no].ans.guid);
+              const selectedItems_other = answersToShuffle.sort(() => 0.5 - Math.random());
 
-            for(let i = 0;  i < 3; i++) {
-              if(i != randomIndexForCorrect){
-                const textures_no_other = await this.answers.findIndex(tx => tx.guid === selectedItems_other[i].guid);
-                const randomOption_other = imgOptions[i];
-                this[randomOption_other] = textures_no_other;
-                console.log(`${randomOption_other}`, textures_no_other);
+              for(let i = 0;  i < 3; i++) {
+                if(i != randomIndexForCorrect){
+                  const textures_no_other = await this.answers.findIndex(tx => tx.guid === selectedItems_other[i].guid);
+                  const randomOption_other = imgOptions[i];
+                  this[randomOption_other] = textures_no_other;
+                  console.log(`${randomOption_other}`, textures_no_other);
+                }
               }
-            }
             }else{
             this.textureImagVol2 = textures_no;
-            this.wordCheckForQMic = this.playerData.lesson[lessonIndex].game[question_no].title;
+            this.textureImagMsgVol2 = textures_no;
+            this.CardBGHint = textures_no;
+            this.wordCheckForQMic = this.playerData.lesson[lessonIndex].game[question_no].ans_sentence;
             console.log('this.wordCheckForQMic ', this.wordCheckForQMic );
             }
           }
@@ -886,7 +1164,7 @@
           if(question_no != this.amountQ){
             let logData = {
               question : this.playerData.lesson[lessonIndex].game[question_no].title,
-              type: question_no != this.speakQNo ? "Multiple-choice" : "Speaking",
+              type: question_no < this.speakQNo ? "Multiple-choice" : "Speaking",
               socre : point,
             }
             console.log('logData',logData);
@@ -997,6 +1275,7 @@
           scaleOpt1: 0.8,
           scaleOpt2: 0.8,
           scaleOpt3: 0.8,
+          scaleCardMic:1.05,
           ease: "bounce.out",
           onComplete: async () => {
             await this.playMusic();
@@ -1037,6 +1316,7 @@
           scaleMic: 0,
           scaleBgMic: 0,
           scaleVol4: 0,
+          scaleCardMic:0,
           ease: "bounce.out",
           onComplete: async () => {
             await this.playMusic();
@@ -1055,6 +1335,7 @@
           scaleMic: 0,
           scaleBgMic: 0,
           scaleVol4: 0,
+          scaleCardMic:0,
           onComplete: async () => {
             this.IsAble = false;
             if(this.voiceWord != null){
@@ -1086,10 +1367,11 @@
         tl.to(this.$data,
         {
           duration: 0.5,
-          scaleQ4: 1,
+          scaleQ4: 1.5,
           scaleMic: 0.6,
           scaleBgMic: 0.6,
           scaleVol4: 0.5,
+          scaleCardMic:1.05,
           ease: "bounce.out",
           onComplete: async () => {
             await this.playMusic();
@@ -1225,6 +1507,7 @@
             recognition.interimResults = false; // Get final results only
             // Set maximum length of recognized phrase
             const MAX_PHRASE_LENGTH = 10; // for example, allow phrases up to 5 words
+            console.log('this.wordCheckForQMic', this.wordCheckForQMic);
             recognition.onresult = async (event) => { // Event handler when speech is recognized
                 this.transcriptTracks = transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
                 words = transcript.split(' '); // Split transcript into words
@@ -1233,24 +1516,72 @@
                 if (words.length >= MAX_PHRASE_LENGTH) {
                     console.log('Phrase is too long. Ignoring.');
                 }
-                if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
-                    stopRecognition();
-                    await this.nextQuestion(1);
-                    await this.animateChangeQuestionVoice2();
-                }else{
-                  console.log("Wrong!!!!", this.wordCheckForQMic);
-                } 
+
+                if (this.wordCheckForQMic) {
+                  for (const { phrase, reqAdd } of this.wordCheckForQMic) {
+                      if (transcript.includes(phrase)) {
+                        console.log('reqAdd', reqAdd);
+                          if (reqAdd) {
+                              // Check if there are additional words after the matched phrase
+                              const index = transcript.indexOf(phrase);
+                              const wordsAfterPhrase = transcript.slice(index + phrase.length).trim().split(' ');
+                              console.log('index:', index);
+                              console.log('wordsAfterPhrase:', wordsAfterPhrase);
+                              if (wordsAfterPhrase.length === 0 || (wordsAfterPhrase.length === 1 && wordsAfterPhrase[0] === "")) {
+                                  console.log(`Matched phrase "${phrase}" but no additional words.`);
+                                  this.countForSkip();
+                                  return; // Exit the loop if no additional words are found
+                              }
+
+                              // Adjust this threshold as per your requirements
+                              const MIN_ADDITIONAL_WORDS = 1; // Minimum number of additional words required
+                              
+                              if (wordsAfterPhrase.length >= MIN_ADDITIONAL_WORDS) {
+                                  console.log(`Matched phrase: ${phrase}`);
+                                  console.log('Additional words:', wordsAfterPhrase);
+                                  
+                                  // Perform actions if the phrase is matched and there are additional words
+                                  stopRecognition();
+                                  await this.nextQuestion(1);
+                                  await this.animateChangeQuestionVoice2();
+                              } else {
+                                  console.log(`Matched phrase "${phrase}" but no additional words.`);
+                                  this.countForSkip();
+                              }
+                          } else {
+                              console.log(`Matched phrase "${phrase}" with no additional words required.`);
+                              
+                              // Perform actions if no additional words are required
+                              stopRecognition();
+                              await this.nextQuestion(1);
+                              await this.animateChangeQuestionVoice2();
+                          }
+                          
+                          return; // Exit the loop after finding the first matched phrase
+                      }
+                  }
+                  
+                  // If no matching phrase is found
+                  console.log('No matching phrase found.');
+                  this.countForSkip();
+              } else {
+                  console.error('phrasesToCheck is not defined.');
+              }
+                // if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
+                //     stopRecognition();
+                //     await this.nextQuestion(1);
+                //     await this.animateChangeQuestionVoice2();
+                // }else{
+                //   this.countForSkip();
+                // } 
             };
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
+                this.ShowBtnSkip = true;
                 stopRecognition(); // Stop recognition on error
             };
             recognition.onend = async () => {
                 console.log('Speech recognition ended.');
-                this.countSpeakingQ += 1;
-                if(this.countSpeakingQ >= 3){
-                  this.ShowBtnSkip = true;
-                }
                 this.transcriptTracks = "...";
                 stopRecognition(); // Stop recognition when it naturally ends
               };
@@ -1269,6 +1600,13 @@
           }
         } else {
           stopRecognition(); // Stop recognition if already listening
+        }
+      },
+
+      countForSkip(){
+        this.countSpeakingQ += 1;
+        if(this.countSpeakingQ >= 3){
+          this.ShowBtnSkip = true;
         }
       },
 

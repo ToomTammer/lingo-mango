@@ -1,0 +1,44 @@
+{
+  "hints": [
+    {
+      "guid": 0,
+      "title": "what sport do you like to play?",
+      "img": "Hint_1.png"
+    },
+    {
+      "guid": 1,
+      "title": "Do you like to play games?",
+      "img": "Hint_2.png"
+    },
+    {
+      "guid": 2,
+      "title": "Do you like to play volleyball?",
+      "img": "Hint_2.png"
+    },
+    {
+      "guid": 3,
+      "title": "What is he doing? [basketball]",
+      "img": "Hint_3.png"
+    },
+    {
+      "guid": 4,
+      "title": "What is she doing? [badminton]",
+      "img": "Hint_3.png"
+    },
+    {
+      "guid": 6,
+      "title": "What are they doing? [soccer]",
+      "img": "Hint_3.png"
+    },
+    {
+      "guid": 7,
+      "title": "What sport do you like?",
+      "img": "Hint_1.png"
+    },
+    {
+      "guid": 8,
+      "title": "Do you like soccer?",
+      "img": "Hint_2.png"
+    }
+  ]
+}

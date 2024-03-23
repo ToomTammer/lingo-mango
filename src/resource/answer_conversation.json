@@ -1,0 +1,44 @@
+{
+  "answers": [
+    {
+      "guid": 0,
+      "title": "what sport do you like to play?",
+      "img": "normalMood.png"
+    },
+    {
+      "guid": 1,
+      "title": "Do you like to play games?",
+      "img": "normalMood.png"
+    },
+    {
+      "guid": 2,
+      "title": "Do you like to play volleyball?",
+      "img": "normalMood.png"
+    },
+    {
+      "guid": 3,
+      "title": "What is he doing? [basketball]",
+      "img": "HePlayBasketball.png"
+    },
+    {
+      "guid": 4,
+      "title": "What is she doing? [badminton]",
+      "img": "shePlayBadminton.png"
+    },
+    {
+      "guid": 6,
+      "title": "What are they doing? [soccer]",
+      "img": "TheyPlaySoccer.png"
+    },
+    {
+      "guid": 7,
+      "title": "What sport do you like?",
+      "img": "normalMood.png"
+    },
+    {
+      "guid": 8,
+      "title": "Do you like soccer?",
+      "img": "normalMood.png"
+    }
+  ]
+}

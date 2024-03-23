@@ -15,6 +15,10 @@
       {
         "guid": 3,
         "img": "bgMic.png"
+      },
+      {
+        "guid": 4,
+        "img": "micConver.png"
       }
     ]
   }

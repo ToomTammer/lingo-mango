@@ -197,7 +197,7 @@ export default {
           await this.loadMusic(this.SportAndGameMusic);
           this.isGame = true;
           this.isHome = false;
-          let lessonGuid = "unit0121";
+          let lessonGuid = "unit07Conver";
           sessionStorage.setItem('lessonGuid', JSON.stringify(lessonGuid));
           break;
         }

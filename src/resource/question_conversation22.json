@@ -1,0 +1,34 @@
+[
+    {
+      "guid": "unit07-conversation",
+      "title" :"Sports And Games Words Conversation",
+      "questions": [
+        {
+          "guid": 0,
+          "title": "",
+          "is_multi": false,
+          "has_AddImg": false,
+          "questions": {
+            "qn": "what sport do you like to play?",
+            "voice": "peaking/say_badminton.mp3",
+            "imgQn" :"msgChar.png",
+            "AddImg":""
+          },
+          "option": [
+            {
+              "imgOpt1": "/SportAndGame/conversation/opt1.png",
+              "fullOpt1": "/SportAndGame/conversation/msg_full.png",
+              "msgOpt1": ["I like to play..."]
+            },
+            {
+              "imgOpt2": "/SportAndGame/conversation/opt2.png",
+              "fullOpt2": "/SportAndGame/conversation/msg_full.png",
+              "msgOpt2": ["I like to play..."]
+            }
+          ]
+        }
+      ]
+    }
+    
+  ]
+  

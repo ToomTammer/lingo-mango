@@ -19,6 +19,11 @@
         "guid": 3,
         "title": "white",
         "img": "box6.png"
+      },
+      {
+        "guid": 4,
+        "title": "bg-big-mic",
+        "img": "bgOption.png"
       }
     ]
   }

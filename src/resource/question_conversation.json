@@ -1,106 +1,126 @@
 [
-    {
-      "guid": "unit07-conversation",
-      "title" :"Sports And Games Words Conversation",
-      "questions": [
-        {
+  {
+    "guid": "unit07Conver",
+    "title" :"Sports And Games Conversation",
+    "questions": [
+      {
+        "guid": 0,
+        "title": "what sport do you like to play?",
+        "ans_sentence": [
+          { "phrase": "i like to play", "reqAdd": true },
+          { "phrase": "i don't like sport", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/whatSportDoYouLikeToPlay.mp3",
+        "voice2": "conversation/voice/whatSportDoYouLikeToPlay.mp3",
+        "ans": {
           "guid": 0,
-          "title": "",
-          "is_multi": false,
-          "has_AddImg": false,
-          "questions": {
-            "qn": "what sport do you like to play?",
-            "voice": "word/voice/tap_pingpong.png",
-            "imgQn" :"",
-            "AddImg":""
-          },
-          "option": [
-            {
-              "imgOpt1": "word/voice/tap_pingpong.png",
-              "fullOpt1": "word/voice/tap_pingpong.png",
-              "msgOpt1": ["I like to play..."]
-            },
-            {
-              "imgOpt2": "",
-              "fullOpt2": "",
-              "msgOpt2": []
-            }
-          ]
-        },
-        {
-          "guid":1,
-          "title": "",
-          "is_multi": true,
-          "has_AddImg": false,
-          "questions": {
-            "qn": "Do you like to palt darts?",
-            "voice": "word/voice/tap_pingpong.png",
-            "imgQn" :"",
-            "AddImg":""
-          },
-          "option": [
-            {
-              "imgOpt1": "word/voice/tap_pingpong.png",
-              "fullOpt1": "word/voice/tap_pingpong.png",
-              "msgOpt1": ["Yes, I do.", "Yes, I do. I like to play darts."]
-            },
-            {
-              "imgOpt2": "",
-              "fullOpt2": "",
-              "msgOpt2": ["No, I don't.", "No, I do not.", "No, I don't. I like to play darts", "No, I do not. I like to play darts"]
-            }
-          ]
-        },
-        {
-          "guid":2,
-          "title": "",
-          "is_multi": false,
-          "has_AddImg": true,
-          "questions": {
-            "qn": "What is he doing?  ",
-            "voice": "word/voice/tap_pingpong.png",
-            "imgQn" :"",
-            "AddImg":""
-          },
-          "option": [
-            {
-              "imgOpt1": "word/voice/tap_pingpong.png",
-              "fullOpt1": "word/voice/tap_pingpong.png",
-              "msgOpt1": ["he is playing basketball."]
-            },
-            {
-              "imgOpt2": "",
-              "fullOpt2": "",
-              "msgOpt2": []
-            }
-          ]
-        },
-        {
-          "guid":3,
-          "title": "",
-          "is_multi": false,
-          "has_AddImg": true, 
-          "questions": {
-            "qn": "What is she doing?  ",
-            "voice": "word/voice/tap_pingpong.png",
-            "imgQn" :"",
-            "AddImg":""
-          },
-          "option": [
-            {
-              "imgOpt1": "word/voice/tap_pingpong.png",
-              "fullOpt1": "word/voice/tap_pingpong.png",
-              "msgOpt1": ["She is playing badminton."]
-            },
-            {
-              "imgOpt2": "",
-              "fullOpt2": "",
-              "msgOpt2": []
-            }
-          ]
+          "score": 1
         }
-      ]
-    }
-    
-  ]
+      },
+      {
+        "guid": 1,
+        "title": "Do you like to play games?",
+        "ans_sentence": [
+          { "phrase": "yes i do i like to play", "reqAdd": true },
+          { "phrase": "no i don't i like to do", "reqAdd": true },
+          { "phrase": "no i don't i like to play", "reqAdd": true }
+        ],
+        "voice1": "conversation/voice/DoYouLikeToPlayGames.mp3",
+        "voice2": "conversation/voice/DoYouLikeToPlayGames.mp3",
+        "ans": {
+          "guid": 1,
+          "score": 1
+        }
+      },
+      {
+        "guid": 2,
+        "title": "Do you like to play volleyball?",
+        "ans_sentence": [
+          { "phrase": "yes i do i like to play volleyball", "reqAdd": false },
+          { "phrase": "no i don't i like to do", "reqAdd": true },
+          { "phrase": "no i don't i like to play", "reqAdd": true },
+          { "phrase": "yes i do", "reqAdd": false },
+          { "phrase": "no i don’t", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/DoYouLikeToPlayVolleyball.mp3",
+        "voice2": "conversation/voice/DoYouLikeToPlayVolleyball.mp3",
+        "ans": {
+          "guid": 2,
+          "score": 1
+        }
+      },
+      {
+        "guid": 3,
+        "title": "What is he doing? [basketball]",
+        "ans_sentence": [
+          { "phrase": "he is playing basketball", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/whatIsHeDoing_Basketball.mp3",
+        "voice2": "conversation/voice/whatIsHeDoing_Basketball.mp3",
+        "ans": {
+          "guid": 3,
+          "score": 1
+        }
+      },
+      {
+        "guid": 4,
+        "title": "What is she doing? [badminton]",
+        "ans_sentence": [
+          { "phrase": "she is playing badminton", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/whatIsSheDoing_Badminton.mp3",
+        "voice2": "conversation/voice/whatIsSheDoing_Badminton.mp3",
+        "ans": {
+          "guid": 4,
+          "score": 1
+        }
+      },
+      {
+        "guid": 6,
+        "title": "What are they doing? [soccer]",
+        "ans_sentence": [
+          { "phrase": "they are playing soccer", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
+        "voice2": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
+        "ans": {
+          "guid": 6,
+          "score": 1
+        }
+      },
+      {
+        "guid": 7,
+        "title": "What sport do you like?",
+        "ans_sentence": [
+          { "phrase": "i like", "reqAdd": true },
+          { "phrase": "i like to play", "reqAdd": true },
+          { "phrase": "i don't like sport", "reqAdd": false }
+        ],
+        "voice1": "conversation/voice/WhatSportDoYouLike.mp3",
+        "voice2": "conversation/voice/WhatSportDoYouLike.mp3",
+        "ans": {
+          "guid": 7,
+          "score": 1
+        }
+      },
+      {
+        "guid": 8,
+        "title": "Do you like soccer?",
+        "ans_sentence": [
+          { "phrase": "yes i do", "reqAdd": false },
+          { "phrase": "no i don’t", "reqAdd": false },
+          { "phrase": "yes i do i like to play soccer", "reqAdd": false },
+          { "phrase": "no i don't i like to do", "reqAdd": true },
+          { "phrase": "no i don't i like to play", "reqAdd": true }
+        ],
+        "voice1": "conversation/voice/DoYouLikeSoccer.mp3",
+        "voice2": "conversation/voice/DoYouLikeSoccer.mp3",
+        "ans": {
+          "guid": 8,
+          "score": 1
+        }
+      }
+    ]
+  }
   
+]
