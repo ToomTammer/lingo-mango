@@ -171,7 +171,7 @@
       },
       {
         "guid": 6,
-        "title": ["soccer"],
+        "title": ["soccer", "football"],
         "voice1": "word/voice/tap_soccer.mp3",
         "voice2": "speaking/say_soccer.mp3",
         "ans": {

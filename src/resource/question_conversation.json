@@ -81,7 +81,8 @@
         "guid": 6,
         "title": "What are they doing? [soccer]",
         "ans_sentence": [
-          { "phrase": "they are playing soccer", "reqAdd": false }
+          { "phrase": "they are playing soccer", "reqAdd": false },
+          { "phrase": "they are playing football", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
         "voice2": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
