@@ -1023,42 +1023,46 @@
       },
 
       async selectRandomItems(data, count) {
-        // console.log("###selectRandomItems");
-        const shuffled = data.sort(() => 0.5 - Math.random());
-        this.selectedItems = shuffled.slice(0, count).map(item => ({
-          guid: item.guid,
-          title: item.title,
-          ans_sentence: item.ans_sentence,
-          voice1: item.voice1,
-          voice2: item.voice2,
-          ans: item.ans
-        }));
-        
-        const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
-        if(this.isRestartNewGame && this.IsExistPlayer && lessonIndex != -1){
-          // console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
-          this.playerData.lesson[lessonIndex].game = this.selectedItems;
-          this.playerData.lesson[lessonIndex].score = 0;
-          this.playerData.lesson[lessonIndex].question_no = 0;
-        }else{
-            this.qusetionOfEachUnit = {
-            guid: this.lessonGuid,
-            title : this.questions.title,
-            score: 0,
-            question_no:0,
-            game : [],
-            log : [],
-            alllog : []
+        console.log("###selectRandomItems");
+        try{
+          const shuffled = data.sort(() => 0.5 - Math.random());
+          this.selectedItems = shuffled.slice(0, count).map(item => ({
+            guid: item.guid,
+            title: item.title,
+            ans_sentence: item.ans_sentence,
+            voice1: item.voice1,
+            voice2: item.voice2,
+            ans: item.ans
+          }));
+          
+          const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
+          if(this.isRestartNewGame && this.IsExistPlayer && lessonIndex != -1){
+            // console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
+            this.playerData.lesson[lessonIndex].game = this.selectedItems;
+            this.playerData.lesson[lessonIndex].score = 0;
+            this.playerData.lesson[lessonIndex].question_no = 0;
+          }else{
+              this.qusetionOfEachUnit = {
+              guid: this.lessonGuid,
+              title : this.questions.title,
+              score: 0,
+              question_no:0,
+              game : [],
+              log : [],
+              alllog : []
+            }
+
+            this.qusetionOfEachUnit.game = this.selectedItems;
+            this.allUnit.push(this.qusetionOfEachUnit);
           }
-
-          this.qusetionOfEachUnit.game = this.selectedItems;
-          this.allUnit.push(this.qusetionOfEachUnit);
+        }catch{
+          this.backToHome();
         }
-
+        
       },
 
       async checkExistPlayerData(){
-        // console.log("###checkExistPlayerData");
+        console.log("###checkExistPlayerData");
         this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
         // console.log("###currentPlayerIndex", currentPlayerIndex);
@@ -1071,7 +1075,7 @@
       },
 
       async SetPlayerData() {
-        // console.log("###SetPlayerData");
+        console.log("###SetPlayerData");
         if(this.isRestartNewGame && this.IsExistPlayer){
           const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
           this.allPlayerData[currentPlayerIndex] = this.playerData;
@@ -1625,6 +1629,9 @@
       beforeStart(){
         window.addEventListener("load", (event) => {
         if (event.target.readyState === "complete") {
+          if(this.playerName == 'unknown'){
+            this.backToHome();
+          }
           setTimeout(() => {
             this.startCountdown();
           }, 900);

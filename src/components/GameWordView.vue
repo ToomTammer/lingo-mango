@@ -1498,6 +1498,9 @@
       beforeStart(){
         window.addEventListener("load", (event) => {
         if (event.target.readyState === "complete") {
+          if(this.playerName == 'unknown'){
+            this.backToHome();
+          }
           setTimeout(() => {
             this.startCountdown();
           }, 900);
