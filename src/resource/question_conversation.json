@@ -8,7 +8,27 @@
         "title": "what sport do you like to play?",
         "ans_sentence": [
           { "phrase": "i like to play", "reqAdd": true },
-          { "phrase": "i don't like sport", "reqAdd": false }
+          { "phrase": "I like to clay", "reqAdd": true },
+          { "phrase": "I like to sway", "reqAdd": true },
+          { "phrase": "I like to stay", "reqAdd": true },
+          { "phrase": "I like to say", "reqAdd": true },
+          { "phrase": "I like to fray", "reqAdd": true },
+          { "phrase": "I like to pay", "reqAdd": true },
+          { "phrase": "I like to weigh", "reqAdd": true },
+          { "phrase": "I like to bray", "reqAdd": true },
+          { "phrase": "I like to neigh", "reqAdd": true },
+
+          { "phrase": "i don't like sport", "reqAdd": false },
+          { "phrase": "i don't like court", "reqAdd": false },
+          { "phrase": "i don't like short", "reqAdd": false },
+          { "phrase": "i don't like sort", "reqAdd": false },
+          { "phrase": "i don't like report", "reqAdd": false },
+          { "phrase": "i don't like snort", "reqAdd": false },
+          { "phrase": "i don't like port", "reqAdd": false },
+          { "phrase": "i don't like resort", "reqAdd": false },
+          { "phrase": "i don't like thwart", "reqAdd": false },
+          { "phrase": "i don't like support", "reqAdd": false },
+          { "phrase": "i don't like import", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatSportDoYouLikeToPlay.mp3",
         "voice2": "conversation/voice/whatSportDoYouLikeToPlay.mp3",
@@ -22,6 +42,17 @@
         "title": "Do you like to play games?",
         "ans_sentence": [
           { "phrase": "yes i do i like to play", "reqAdd": true },
+          { "phrase": "yes i do i like to sway", "reqAdd": true },
+          { "phrase": "yes i do i like to stay", "reqAdd": true },
+          { "phrase": "yes i do i like to say", "reqAdd": true },
+          { "phrase": "yes i do i like to slay", "reqAdd": true },
+          { "phrase": "yes i do i like to bay", "reqAdd": true },
+          { "phrase": "yes i do i like to weigh", "reqAdd": true },
+          { "phrase": "yes i do i like to spray", "reqAdd": true },
+          { "phrase": "yes i do i like to pray", "reqAdd": true },
+          { "phrase": "yes i do i like to bray", "reqAdd": true },
+          { "phrase": "yes i do i like to fray", "reqAdd": true },
+
           { "phrase": "no i don't i like to do", "reqAdd": true },
           { "phrase": "no i don't i like to play", "reqAdd": true },
           { "phrase": "yes i do", "reqAdd": false },
@@ -41,6 +72,7 @@
           { "phrase": "yes i do i like to play volleyball", "reqAdd": false },
           { "phrase": "no i don't i like to do", "reqAdd": true },
           { "phrase": "no i don't i like to play", "reqAdd": true },
+          { "phrase": "no i don't i like to pray", "reqAdd": true },
           { "phrase": "yes i do", "reqAdd": false },
           { "phrase": "no i don't", "reqAdd": false }
         ],
@@ -55,7 +87,8 @@
         "guid": 3,
         "title": "What is he doing? [basketball]",
         "ans_sentence": [
-          { "phrase": "he is playing basketball", "reqAdd": false }
+          { "phrase": "he is playing basketball", "reqAdd": false },
+          { "phrase": "he is praying basketball", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatIsHeDoing_Basketball.mp3",
         "voice2": "conversation/voice/whatIsHeDoing_Basketball.mp3",
@@ -68,7 +101,8 @@
         "guid": 4,
         "title": "What is she doing? [badminton]",
         "ans_sentence": [
-          { "phrase": "she is playing badminton", "reqAdd": false }
+          { "phrase": "she is playing badminton", "reqAdd": false },
+          { "phrase": "he is praying basketball", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatIsSheDoing_Badminton.mp3",
         "voice2": "conversation/voice/whatIsSheDoing_Badminton.mp3",
@@ -82,7 +116,9 @@
         "title": "What are they doing? [soccer]",
         "ans_sentence": [
           { "phrase": "they are playing soccer", "reqAdd": false },
-          { "phrase": "they are playing football", "reqAdd": false }
+          { "phrase": "they are playing football", "reqAdd": false },
+          { "phrase": "they are praying soccer", "reqAdd": false },
+          { "phrase": "they are praying football", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
         "voice2": "conversation/voice/whatIsTheyDoing_Soccer.mp3",
@@ -97,7 +133,9 @@
         "ans_sentence": [
           { "phrase": "i like", "reqAdd": true },
           { "phrase": "i like to play", "reqAdd": true },
-          { "phrase": "i don't like sport", "reqAdd": false }
+          { "phrase": "i like to pray", "reqAdd": true },
+          { "phrase": "i don't like sport", "reqAdd": false },
+          { "phrase": "i don't like support", "reqAdd": false }
         ],
         "voice1": "conversation/voice/WhatSportDoYouLike.mp3",
         "voice2": "conversation/voice/WhatSportDoYouLike.mp3",
@@ -113,8 +151,10 @@
           { "phrase": "yes i do", "reqAdd": false },
           { "phrase": "no i don't", "reqAdd": false },
           { "phrase": "yes i do i like to play soccer", "reqAdd": false },
+          { "phrase": "yes i do i like to pray soccer", "reqAdd": false },
           { "phrase": "no i don't i like to do", "reqAdd": true },
-          { "phrase": "no i don't i like to play", "reqAdd": true }
+          { "phrase": "no i don't i like to play", "reqAdd": true },
+          { "phrase": "no i don't i like to pray", "reqAdd": true }
         ],
         "voice1": "conversation/voice/DoYouLikeSoccer.mp3",
         "voice2": "conversation/voice/DoYouLikeSoccer.mp3",
