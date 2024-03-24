@@ -23,7 +23,9 @@
         "ans_sentence": [
           { "phrase": "yes i do i like to play", "reqAdd": true },
           { "phrase": "no i don't i like to do", "reqAdd": true },
-          { "phrase": "no i don't i like to play", "reqAdd": true }
+          { "phrase": "no i don't i like to play", "reqAdd": true },
+          { "phrase": "yes i do", "reqAdd": false },
+          { "phrase": "no i don't", "reqAdd": false }
         ],
         "voice1": "conversation/voice/DoYouLikeToPlayGames.mp3",
         "voice2": "conversation/voice/DoYouLikeToPlayGames.mp3",
@@ -40,7 +42,7 @@
           { "phrase": "no i don't i like to do", "reqAdd": true },
           { "phrase": "no i don't i like to play", "reqAdd": true },
           { "phrase": "yes i do", "reqAdd": false },
-          { "phrase": "no i don’t", "reqAdd": false }
+          { "phrase": "no i don't", "reqAdd": false }
         ],
         "voice1": "conversation/voice/DoYouLikeToPlayVolleyball.mp3",
         "voice2": "conversation/voice/DoYouLikeToPlayVolleyball.mp3",
@@ -108,7 +110,7 @@
         "title": "Do you like soccer?",
         "ans_sentence": [
           { "phrase": "yes i do", "reqAdd": false },
-          { "phrase": "no i don’t", "reqAdd": false },
+          { "phrase": "no i don't", "reqAdd": false },
           { "phrase": "yes i do i like to play soccer", "reqAdd": false },
           { "phrase": "no i don't i like to do", "reqAdd": true },
           { "phrase": "no i don't i like to play", "reqAdd": true }

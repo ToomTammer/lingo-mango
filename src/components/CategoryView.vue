@@ -68,14 +68,14 @@ export default {
     this.animatestart();
     await this.GetPlayerName();
     this.IsExistPlayer =  await this.checkExistPlayerData();
-    console.log("###this.IsExistPlayer", this.IsExistPlayer);
+    // console.log("###this.IsExistPlayer", this.IsExistPlayer);
     await this.SetPlayerData();
     await this.setTextures('imagesCateUnit7','catagories/','texturesCateUnit7');
-    console.log("imagesCateUnit7", this.imagesCateUnit7 );
+    // console.log("imagesCateUnit7", this.imagesCateUnit7 );
 
     window.addEventListener("load", (event) => {
       if (event.target.readyState === "complete") {
-        console.log("load complete" );
+        // console.log("load complete" );
       }
     });
 
@@ -253,12 +253,12 @@ export default {
         // log "cube" if the first cube is clicked, or "cube2" if the second cube is clicked
         if (intersects.length > 0) {
           if (intersects[0].object === CardUnit72 && this.IsAble) {
-            console.log("Click img Option1");
+            // console.log("Click img Option1");
             this.goToWordsUnit7();
           }
           if (intersects[0].object === CardUnit74 && this.IsAble){
             this.goToWordsUnit7Conversation();
-            console.log("Click img Option2");
+            // console.log("Click img Option2");
           }
         }
       });
@@ -272,7 +272,7 @@ export default {
         this.analyser.getByteFrequencyData(dataArray);
         const level = Math.max.apply(null, dataArray);
         this.scaleBgMic = level / 150;
-        console.log("isListening", true);
+        // console.log("isListening", true);
       }
 
       const currentTime = Date.now();
@@ -325,7 +325,7 @@ export default {
   },
   methods: {
     async setTextures(data, path, containerName) {
-      console.log("###setTextures");
+      // console.log("###setTextures");
       const textureLoader = new THREE.TextureLoader();
       this[data].forEach(item => {
         const imgPath = require('@/assets/' + path + item.img);
@@ -334,13 +334,13 @@ export default {
         this[containerName].push(texture);
       });
 
-      console.log("setTextures",this[data]);
-      console.log("setTextures Complete");
+      // console.log("setTextures",this[data]);
+      // console.log("setTextures Complete");
     },
 
     async GetPlayerName(){
     this.playerName = await JSON.parse(sessionStorage.getItem('playerName')) || '';
-    console.log("###this.playerName", this.playerName);
+    // console.log("###this.playerName", this.playerName);
     this.resetLocalStorageIfExceedsLimit();
     },
 
@@ -383,7 +383,7 @@ export default {
     },
 
     async SetPlayerData() {
-        console.log("###SetPlayerData");
+        // console.log("###SetPlayerData");
         if(!this.IsExistPlayer){
           this.playerData = {
             name: this.playerName,
@@ -397,11 +397,11 @@ export default {
       },
 
       async checkExistPlayerData(){
-        console.log("###checkExistPlayerData");
+        // console.log("###checkExistPlayerData");
         this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
-        console.log("this.allPlayerData ", this.allPlayerData );
+        // console.log("this.allPlayerData ", this.allPlayerData );
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name == this.playerName);
-        console.log("###currentPlayerIndex", currentPlayerIndex);
+        // console.log("###currentPlayerIndex", currentPlayerIndex);
         if (currentPlayerIndex !== -1) {
           return true;
         }

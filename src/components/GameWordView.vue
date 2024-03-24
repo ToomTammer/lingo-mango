@@ -212,7 +212,7 @@
       this.isRestartNewGame = await JSON.parse(sessionStorage.getItem('isRestartNewGame')) || false;
       this.lessonGuid = await JSON.parse(sessionStorage.getItem('lessonGuid')) || null;
       const GetlessonIndexFromQuestions = await this.questions.findIndex(c => c.guid == this.lessonGuid);
-      console.log('this.isRestartNewGame',this.isRestartNewGame);
+      // console.log('this.isRestartNewGame',this.isRestartNewGame);
 
       ///set mic
       this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -224,11 +224,11 @@
       this.analyser.maxDecibels = -10;
       this.analyser.fftSize = 256;
 
-      console.log("this.audioCtx", this.audioCtx);
-      console.log("this.distortion", this.distortion);
-      console.log("this.gainNode", this.gainNode);
-      console.log("this.biquadFilter", this.biquadFilter);
-      console.log("this.analyser", this.analyser);
+      // console.log("this.audioCtx", this.audioCtx);
+      // console.log("this.distortion", this.distortion);
+      // console.log("this.gainNode", this.gainNode);
+      // console.log("this.biquadFilter", this.biquadFilter);
+      // console.log("this.analyser", this.analyser);
 
       await this.setTextures('answers','SportAndGame/word/img/','textures');
       await this.setTextures('CardSquare','','texturesCardBG');
@@ -242,26 +242,26 @@
 
       this.IsExistPlayer =  await this.checkExistPlayerData();
       if(!this.IsExistPlayer){
-        console.log("No ExistPlayer");
-        console.log('this.questions.question',this.questions[GetlessonIndexFromQuestions].questions);
+        // console.log("No ExistPlayer");
+        // console.log('this.questions.question',this.questions[GetlessonIndexFromQuestions].questions);
         await this.selectRandomItems(this.questions[GetlessonIndexFromQuestions].questions, this.amountQ);
-        console.log("selectedItems : ", this.selectedItems);
+        // console.log("selectedItems : ", this.selectedItems);
         await this.SetPlayerData();
-        console.log("allPlayerData : ", this.allPlayerData);
-        console.log("SetPlayerData : ", this.playerData);
+        // console.log("allPlayerData : ", this.allPlayerData);
+        // console.log("SetPlayerData : ", this.playerData);
       }else{
-        console.log("ExistPlayer");
-        console.log("allPlayerData : ", this.allPlayerData);
-        console.log("this.playerData : ", this.playerData);
+        // console.log("ExistPlayer");
+        // console.log("allPlayerData : ", this.allPlayerData);
+        // console.log("this.playerData : ", this.playerData);
 
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
-        console.log("lessonIndex : ", lessonIndex);
+        // console.log("lessonIndex : ", lessonIndex);
         if(lessonIndex != -1){
           this.uiNoOfQ = this.playerData.lesson[lessonIndex].game;
         }
 
         if(this.isRestartNewGame || lessonIndex == -1){
-          console.log('this.questions.question',this.questions[GetlessonIndexFromQuestions].questions);
+          // console.log('this.questions.question',this.questions[GetlessonIndexFromQuestions].questions);
           await this.selectRandomItems(this.questions[GetlessonIndexFromQuestions].questions, this.amountQ);
           await this.SetPlayerData();
         }
@@ -274,7 +274,7 @@
 
       window.addEventListener("load", (event) => {
         if (event.target.readyState === "complete") {
-          console.log("load complete" );
+          // console.log("load complete" );
         }
       });
 
@@ -672,7 +672,7 @@
             await this.animateChangeQuestion();
           }
           if (intersects[0].object === CardBGOpt3 && this.IsAble && !this.isExitClicked) {
-            console.log("Click img Option3", this.opt3);
+            // console.log("Click img Option3", this.opt3);
             await this.nextQuestion(this.opt3);
             await this.animateAns(2);
             await this.animateChangeQuestion();
@@ -699,7 +699,7 @@
           this.analyser.getByteFrequencyData(dataArray);
           const level = Math.max.apply(null, dataArray);
           this.scaleBgMic = level/150;
-          console.log('this.scaleBgMic', this.scaleBgMic);
+          // console.log('this.scaleBgMic', this.scaleBgMic);
           if(this.scaleBgMic >= 1.3){
             this.scaleBgMic = 1.3;
           }
@@ -857,7 +857,7 @@
       },
 
       async setTextures(data, path, containerName) {
-        console.log("###setTextures");
+        // console.log("###setTextures");
         const textureLoader = new THREE.TextureLoader();
         this[data].forEach(item => {
           const imgPath = require('@/assets/' + path + item.img);
@@ -866,15 +866,15 @@
           this[containerName].push(texture);
         });
 
-        console.log("setTextures",this[data]);
-        console.log("setTextures Complete");
+        // console.log("setTextures",this[data]);
+        // console.log("setTextures Complete");
       },
 
       async setAudio(data, path, val) {
-        console.log("###setAudio");
+        // console.log("###setAudio");
         const GetAudio = require('@/assets/' + path + data[val]);
         this.containerVoiceWord = GetAudio;
-        console.log("Audio", GetAudio);
+        // console.log("Audio", GetAudio);
         await this.loadMusic(this.containerVoiceWord);
       },
 
@@ -907,7 +907,7 @@
 
       loadMusic(src) {
         // If default music is already loaded, do not load it again
-        console.log("###loadMusic");
+        // console.log("###loadMusic");
         if (src === this.containerVoiceWord && this.VoiceLoaded) {
           return;
         }
@@ -915,7 +915,7 @@
         if (this.voiceWord) {
           this.voiceWord.stop();
         }
-        console.log("this.voiceWord", this.voiceWord);
+        // console.log("this.voiceWord", this.voiceWord);
 
         this.voiceWord = new Howl({
           src: [src],
@@ -923,7 +923,7 @@
           // autoplay: true,
           // volume: 0.5,
         });
-        console.log("this.voiceWord", this.voiceWord);
+        // console.log("this.voiceWord", this.voiceWord);
 
         // Set defaultMusicLoaded to true if loading the default music
         if (src === this.containerVoiceWord) {
@@ -932,8 +932,8 @@
       },
 
       playMusic() {
-        console.log("###playMusic");
-        console.log("###this.isListening", this.isListening);
+        // console.log("###playMusic");
+        // console.log("###this.isListening", this.isListening);
         // Change Icons
         // this.isPlaying = !this.isPlaying;
         // If music is playing, pause it
@@ -958,7 +958,7 @@
       },
 
       async selectRandomItems(data, count) {
-        console.log("###selectRandomItems");
+        // console.log("###selectRandomItems");
         const shuffled = data.sort(() => 0.5 - Math.random());
         this.selectedItems = shuffled.slice(0, count).map(item => ({
           guid: item.guid,
@@ -970,7 +970,7 @@
         
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         if(this.isRestartNewGame && this.IsExistPlayer && lessonIndex != -1){
-          console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
+          // console.log('this.isRestartNewGame && this.IsExistPlayer',this.isRestartNewGame && this.IsExistPlayer);
           this.playerData.lesson[lessonIndex].game = this.selectedItems;
           this.playerData.lesson[lessonIndex].score = 0;
           this.playerData.lesson[lessonIndex].question_no = 0;
@@ -992,10 +992,10 @@
       },
 
       async checkExistPlayerData(){
-        console.log("###checkExistPlayerData");
+        // console.log("###checkExistPlayerData");
         this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
-        console.log("###currentPlayerIndex", currentPlayerIndex);
+        // console.log("###currentPlayerIndex", currentPlayerIndex);
         if (currentPlayerIndex !== -1) {
           this.playerData = this.allPlayerData[currentPlayerIndex];
           this.allUnit = this.playerData.lesson;
@@ -1005,7 +1005,7 @@
       },
 
       async SetPlayerData() {
-        console.log("###SetPlayerData");
+        // console.log("###SetPlayerData");
         if(this.isRestartNewGame && this.IsExistPlayer){
           const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
           this.allPlayerData[currentPlayerIndex] = this.playerData;
@@ -1022,14 +1022,14 @@
       },
 
       async SetRandomAns() {
-        console.log("###SetRandomAns");
+        // console.log("###SetRandomAns");
         const options = this.options;
         const imgOptions = this.imgOptions;
 
         const randomIndexForCorrect = Math.floor(Math.random() * options.length);
         const randomOptionCorrect = options[randomIndexForCorrect];
         const correctImgOpt = imgOptions[randomIndexForCorrect];
-        console.log("correctImgOpt", correctImgOpt);
+        // console.log("correctImgOpt", correctImgOpt);
         
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         let question_no =  this.playerData.lesson[lessonIndex].question_no;
@@ -1038,7 +1038,7 @@
           if(question_no != this.amountQ ){
             
             this[randomOptionCorrect] = this.playerData.lesson[lessonIndex].game[question_no].ans.score;
-            console.log("question_no : ", question_no);
+            // console.log("question_no : ", question_no);
             let textures_no = await this.answers.findIndex(tx => tx.guid === this.playerData.lesson[lessonIndex].game[question_no].ans.guid);
             let audio_no = question_no < this.speakQNo ? 1 : 2;
             this.VoiceLoaded = false;
@@ -1054,13 +1054,13 @@
                 const textures_no_other = await this.answers.findIndex(tx => tx.guid === selectedItems_other[i].guid);
                 const randomOption_other = imgOptions[i];
                 this[randomOption_other] = textures_no_other;
-                console.log(`${randomOption_other}`, textures_no_other);
+                // console.log(`${randomOption_other}`, textures_no_other);
               }
             }
             }else{
             this.textureImagVol2 = textures_no;
             this.wordCheckForQMic = this.playerData.lesson[lessonIndex].game[question_no].title;
-            console.log('this.wordCheckForQMic ', this.wordCheckForQMic );
+            // console.log('this.wordCheckForQMic ', this.wordCheckForQMic );
             }
           }
           
@@ -1085,9 +1085,9 @@
         }else{
           this.sfxWrong.play();
         }
-        console.log("###nextQuestion");
+        // console.log("###nextQuestion");
         this.IsAble = false;
-        console.log("this.allPlayerData :", this.allPlayerData);
+        // console.log("this.allPlayerData :", this.allPlayerData);
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
         if (currentPlayerIndex !== -1) {
           const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
@@ -1100,7 +1100,7 @@
               type: question_no < this.speakQNo ? "Multiple-choice" : "Speaking",
               socre : point,
             }
-            console.log('logData',logData);
+            // console.log('logData',logData);
             let allLogData;
 
             this.logDataEachQuestion.push(logData);
@@ -1114,26 +1114,26 @@
           }
            
           
-          console.log("###nextQuestion Update already");
-          console.log("currentPlayer", this.allPlayerData[currentPlayerIndex]);
+          // console.log("###nextQuestion Update already");
+          // console.log("currentPlayer", this.allPlayerData[currentPlayerIndex]);
           localStorage.setItem('allPlayerData', JSON.stringify(this.allPlayerData));
-          console.log("--------------------------------------------");
+          // console.log("--------------------------------------------");
           let allGame = this.playerData.lesson[lessonIndex].game
-          console.log(allGame.length);
+          // console.log(allGame.length);
           if(question_no <= allGame.length){
             this.manageQuestionNo();
           }else{
-            console.log("Finnaly");
+            // console.log("Finnaly");
           }
 
         }
       },
 
       async manageQuestionNo() {
-        console.log("###manageNoquestion");
+        // console.log("###manageNoquestion");
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         let question_no =  this.playerData.lesson[lessonIndex].question_no;
-        console.log("question_no :", question_no);
+        // console.log("question_no :", question_no);
           var questionDivs = document.querySelectorAll(`div[id^="question-"]`);
           for (let i = 0; i < questionDivs.length; i++) {
               if (i === question_no) {
@@ -1155,7 +1155,7 @@
       },
 
       async animateChangeQuestion() {
-        console.log("###animateChangeQuestion1");
+        // console.log("###animateChangeQuestion1");
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         if(this.playerData.lesson[lessonIndex].question_no < this.speakQNo){
           this.animateChangeQuestionOpt();
@@ -1194,7 +1194,7 @@
             }else{
               this.isVisibleSec1 = false;
               this.animateFinalFirst();
-              console.log("Finnal");
+              // console.log("Finnal");
             }
           },
         });
@@ -1217,7 +1217,7 @@
       },
 
       animateChangeQuestionVoice() {
-        console.log("###animateChangeQuestion1");
+        // console.log("###animateChangeQuestion1");
         const tl = gsap.timeline();
         tl.to(this.$data,
         {
@@ -1257,7 +1257,7 @@
         });
       },
       animateChangeQuestionVoice2() {
-        console.log("###animateChangeQuestion2");
+        // console.log("###animateChangeQuestion2");
         const tl = gsap.timeline();
         tl.to(this.$data,
         {
@@ -1285,7 +1285,7 @@
             }else{
               this.isVisibleSec2 = false;
               this.animateFinalFirst();
-              console.log("Finnal");
+              // console.log("Finnal");
             }
           },
         });
@@ -1319,7 +1319,7 @@
         
         this.isFinal = true
         // await this.seveData();
-        console.log("###animateFinalFirst");
+        // console.log("###animateFinalFirst");
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         let score =  this.playerData.lesson[lessonIndex].score;
         let one = 0;
@@ -1425,7 +1425,7 @@
 
             let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.log("SpeechRecognition is not supported in this browser.");
+                // console.log("SpeechRecognition is not supported in this browser.");
                 return;
             }
 
@@ -1439,10 +1439,10 @@
             recognition.onresult = async (event) => { // Event handler when speech is recognized
                 this.transcriptTracks = transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
                 words = transcript.split(' '); // Split transcript into words
-                console.log('Transcript:', transcript);
-                console.log('words:', words);
+                // console.log('Transcript:', transcript);
+                // console.log('words:', words);
                 if (words.length >= MAX_PHRASE_LENGTH) {
-                    console.log('Phrase is too long. Ignoring.');
+                    // console.log('Phrase is too long. Ignoring.');
                 }
                 if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
                     stopRecognition();
@@ -1458,7 +1458,7 @@
                 stopRecognition(); // Stop recognition on error
             };
             recognition.onend = async () => {
-                console.log('Speech recognition ended.');
+                // console.log('Speech recognition ended.');
                 this.transcriptTracks = "...";
                 stopRecognition(); // Stop recognition when it naturally ends
               };
@@ -1468,12 +1468,12 @@
 
             // Set timeout for silence
             timeoutId = setTimeout(() => {
-                console.log('No speech detected. 10 seconds.');
+                // console.log('No speech detected. 10 seconds.');
                 stopRecognition()
             }, 10000); // 10 seconds
 
           } catch (err) {
-            console.log('The following gUM error occured: ' + err);
+            // console.log('The following gUM error occured: ' + err);
           }
         } else {
           stopRecognition(); // Stop recognition if already listening

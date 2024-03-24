@@ -308,7 +308,7 @@ export default {
           src: [src],
           loop: true,
           autoplay: shouldPlayMusic,
-          volume: 0.4,
+          volume: 0.3,
         });
       }else{
         this.music = new Howl({

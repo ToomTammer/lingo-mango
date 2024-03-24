@@ -19,7 +19,7 @@
         window.addEventListener("load", (event) => {
       if (event.target.readyState === "complete") {
         this.isloaded = true;
-        console.log("isloaded", this.isloaded);
+        // console.log("isloaded", this.isloaded);
       }
     });
     },

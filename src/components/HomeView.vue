@@ -109,7 +109,7 @@ export default {
 
     window.addEventListener("load", (event) => {
       if (event.target.readyState === "complete") {
-        console.log("load complete" );
+        // console.log("load complete" );
       }
     });
 
@@ -283,7 +283,7 @@ export default {
         this.analyser.getByteFrequencyData(dataArray);
         const level = Math.max.apply(null, dataArray);
         this.scaleBgMic = level / 150;
-        console.log("isListening", true);
+        // console.log("isListening", true);
       }
 
       const currentTime = Date.now();
@@ -350,7 +350,7 @@ export default {
   methods: {
 
     async setTextures(data, path, containerName) {
-      console.log("###setTextures");
+      // console.log("###setTextures");
       const textureLoader = new THREE.TextureLoader();
       this[data].forEach(item => {
         const imgPath = require('@/assets/' + path + item.img);
@@ -359,8 +359,8 @@ export default {
         this[containerName].push(texture);
       });
       
-      console.log("setTextures",this[data]);
-      console.log("setTextures Complete");
+      // console.log("setTextures",this[data]);
+      // console.log("setTextures Complete");
     },
 
     async sessionStoragePlayerData(data){
