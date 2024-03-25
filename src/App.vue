@@ -271,12 +271,12 @@ export default {
             if(this.currentMusic === this.audefault){
               this.isPlaying = true;
               this.MasterPlaying = true;
-              this.music.fade(0, 1, 2000);
+              this.music.fade(0, 0.05, 1000);
               this.music.play();
             }else{
               this.isPlaying = true;
               this.MasterPlaying = true;
-              this.music.fade(0, 0.2, 2000);
+              this.music.fade(0, 0.05, 1000);
               this.music.play();
             }
 
@@ -308,14 +308,14 @@ export default {
           src: [src],
           loop: true,
           autoplay: shouldPlayMusic,
-          volume: 0.3,
+          volume: 0.05,
         });
       }else{
         this.music = new Howl({
           src: [src],
           loop: true,
           autoplay: shouldPlayMusic,
-          volume: 0.2,
+          volume: 0.05,
         });
       }
       
