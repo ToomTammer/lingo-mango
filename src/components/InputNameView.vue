@@ -58,7 +58,7 @@ export default {
     border: none;
     border-radius: 15px;
     text-align: center;
-    font-size: 24px;
+    font-size: 2vw;
     font-family:"balloo tamma", sans-serif;
 }
 .button{
@@ -94,7 +94,9 @@ export default {
 
 .sub-container-input{
   margin-bottom: 20px;
-  height: 60%;
+  height: auto;
+  min-height: 30px;
+  max-height: 60px;
   width: 50%;
   flex-direction: column;
   display: flex;
