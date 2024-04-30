@@ -1437,7 +1437,8 @@
             // Set maximum length of recognized phrase
             const MAX_PHRASE_LENGTH = 10; // for example, allow phrases up to 5 words
             recognition.onresult = async (event) => { // Event handler when speech is recognized
-                this.transcriptTracks = transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
+                // this.transcriptTracks = 
+                transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
                 words = transcript.split(' '); // Split transcript into words
                 // console.log('Transcript:', transcript);
                 // console.log('words:', words);

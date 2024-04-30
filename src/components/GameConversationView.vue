@@ -1062,7 +1062,7 @@
       },
 
       async checkExistPlayerData(){
-        console.log("###checkExistPlayerData");
+        // console.log("###checkExistPlayerData");
         this.allPlayerData = await JSON.parse(localStorage.getItem('allPlayerData')) || [];
         const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
         // console.log("###currentPlayerIndex", currentPlayerIndex);
@@ -1227,7 +1227,7 @@
       },
 
       async animateChangeQuestion() {
-        console.log("###animateChangeQuestion1");
+        // console.log("###animateChangeQuestion1");
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         if(this.playerData.lesson[lessonIndex].question_no < this.speakQNo){
           this.animateChangeQuestionOpt();
@@ -1517,7 +1517,8 @@
             const MAX_PHRASE_LENGTH = 10; // for example, allow phrases up to 5 words
             // console.log('this.wordCheckForQMic', this.wordCheckForQMic);
             recognition.onresult = async (event) => { // Event handler when speech is recognized
-                this.transcriptTracks = transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
+                // this.transcriptTracks = 
+                transcript += event.results[event.results.length - 1][0].transcript.toLowerCase(); // Get the transcript and convert to lowercase
                 words = transcript.split(' '); // Split transcript into words
                 // console.log('Transcript:', transcript);
                 // console.log('words:', words);

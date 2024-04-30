@@ -102,7 +102,7 @@
         "title": "What is she doing? [badminton]",
         "ans_sentence": [
           { "phrase": "she is playing badminton", "reqAdd": false },
-          { "phrase": "he is praying basketball", "reqAdd": false }
+          { "phrase": "she is praying basketball", "reqAdd": false }
         ],
         "voice1": "conversation/voice/whatIsSheDoing_Badminton.mp3",
         "voice2": "conversation/voice/whatIsSheDoing_Badminton.mp3",
