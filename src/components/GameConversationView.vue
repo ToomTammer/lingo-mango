@@ -1023,7 +1023,7 @@
       },
 
       async selectRandomItems(data, count) {
-        console.log("###selectRandomItems");
+        // console.log("###selectRandomItems");
         try{
           const shuffled = data.sort(() => 0.5 - Math.random());
           this.selectedItems = shuffled.slice(0, count).map(item => ({
@@ -1075,7 +1075,7 @@
       },
 
       async SetPlayerData() {
-        console.log("###SetPlayerData");
+        // console.log("###SetPlayerData");
         if(this.isRestartNewGame && this.IsExistPlayer){
           const currentPlayerIndex = await this.allPlayerData.findIndex(player => player.name === this.playerName);
           this.allPlayerData[currentPlayerIndex] = this.playerData;
@@ -1473,6 +1473,7 @@
         const stopRecognition = () => {
             const tl = gsap.timeline();
             this.stopBGMusic(false);
+            this.textureMic = 4;
             tl.to(this.$data,
             {
               duration: 1,
@@ -1490,6 +1491,7 @@
 
         if (!this.isListening) {
           this.stopBGMusic(true);
+          this.textureMic = 2;
           try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.isListening = true;
@@ -1526,6 +1528,73 @@
                     console.log('Phrase is too long. Ignoring.');
                 }
 
+              //   if (this.wordCheckForQMic) {
+              //     for (const { phrase, reqAdd } of this.wordCheckForQMic) {
+              //         if (transcript.includes(phrase)) {
+              //           // console.log('reqAdd', reqAdd);
+              //             if (reqAdd) {
+              //                 // Check if there are additional words after the matched phrase
+              //                 const index = transcript.indexOf(phrase);
+              //                 const wordsAfterPhrase = transcript.slice(index + phrase.length).trim().split(' ');
+              //                 // console.log('index:', index);
+              //                 // console.log('wordsAfterPhrase:', wordsAfterPhrase);
+              //                 if (wordsAfterPhrase.length === 0 || (wordsAfterPhrase.length === 1 && wordsAfterPhrase[0] === "")) {
+              //                     // console.log(`Matched phrase "${phrase}" but no additional words.`);
+              //                     this.countForSkip();
+              //                     return; // Exit the loop if no additional words are found
+              //                 }
+
+              //                 // Adjust this threshold as per your requirements
+              //                 const MIN_ADDITIONAL_WORDS = 1; // Minimum number of additional words required
+                              
+              //                 if (wordsAfterPhrase.length >= MIN_ADDITIONAL_WORDS) {
+              //                     // console.log(`Matched phrase: ${phrase}`);
+              //                     // console.log('Additional words:', wordsAfterPhrase);
+                                  
+              //                     // Perform actions if the phrase is matched and there are additional words
+              //                     stopRecognition();
+              //                     await this.nextQuestion(1);
+              //                     await this.animateChangeQuestionVoice2();
+              //                 } else {
+              //                     // console.log(`Matched phrase "${phrase}" but no additional words.`);
+              //                     this.countForSkip();
+              //                 }
+              //             } else {
+              //                 // console.log(`Matched phrase "${phrase}" with no additional words required.`);
+                              
+              //                 // Perform actions if no additional words are required
+              //                 stopRecognition();
+              //                 await this.nextQuestion(1);
+              //                 await this.animateChangeQuestionVoice2();
+              //             }
+                          
+              //             return; // Exit the loop after finding the first matched phrase
+              //         }
+              //     }
+                  
+              //     // If no matching phrase is found
+              //     // console.log('No matching phrase found.');
+              //     this.countForSkip();
+              // } else {
+              //     console.error('phrasesToCheck is not defined.');
+              // }
+                // if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
+                //     stopRecognition();
+                //     await this.nextQuestion(1);
+                //     await this.animateChangeQuestionVoice2();
+                // }else{
+                //   this.countForSkip();
+                // } 
+            };
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                this.ShowBtnSkip = true;
+                stopRecognition(); // Stop recognition on error
+            };
+            recognition.onend = async () => {
+                console.log('Speech recognition ended.');
+                this.transcriptTracks = "...";
+
                 if (this.wordCheckForQMic) {
                   for (const { phrase, reqAdd } of this.wordCheckForQMic) {
                       if (transcript.includes(phrase)) {
@@ -1555,6 +1624,7 @@
                                   await this.animateChangeQuestionVoice2();
                               } else {
                                   // console.log(`Matched phrase "${phrase}" but no additional words.`);
+                                  this.sfxWrong.play();
                                   this.countForSkip();
                               }
                           } else {
@@ -1572,26 +1642,12 @@
                   
                   // If no matching phrase is found
                   // console.log('No matching phrase found.');
+                  this.sfxWrong.play();
                   this.countForSkip();
               } else {
+                  this.sfxWrong.play();
                   console.error('phrasesToCheck is not defined.');
               }
-                // if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
-                //     stopRecognition();
-                //     await this.nextQuestion(1);
-                //     await this.animateChangeQuestionVoice2();
-                // }else{
-                //   this.countForSkip();
-                // } 
-            };
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                this.ShowBtnSkip = true;
-                stopRecognition(); // Stop recognition on error
-            };
-            recognition.onend = async () => {
-                console.log('Speech recognition ended.');
-                this.transcriptTracks = "...";
                 stopRecognition(); // Stop recognition when it naturally ends
               };
 
@@ -1600,9 +1656,9 @@
 
             // Set timeout for silence
             timeoutId = setTimeout(() => {
-                console.log('No speech detected. 10 seconds.');
+                console.log('No speech detected. 60 seconds.');
                 stopRecognition()
-            }, 10000); // 10 seconds
+            }, 60000); // 60 seconds
 
           } catch (err) {
             console.log('The following gUM error occured: ' + err);

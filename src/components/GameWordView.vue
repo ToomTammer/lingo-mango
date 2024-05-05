@@ -1022,14 +1022,14 @@
       },
 
       async SetRandomAns() {
-        // console.log("###SetRandomAns");
         const options = this.options;
         const imgOptions = this.imgOptions;
-
+    
         const randomIndexForCorrect = Math.floor(Math.random() * options.length);
         const randomOptionCorrect = options[randomIndexForCorrect];
         const correctImgOpt = imgOptions[randomIndexForCorrect];
-        // console.log("correctImgOpt", correctImgOpt);
+        ///set ans score are 0
+        await this.setOptionSocre(randomIndexForCorrect);
         
         const lessonIndex = await this.playerData.lesson.findIndex(c => c.guid == this.lessonGuid);
         let question_no =  this.playerData.lesson[lessonIndex].question_no;
@@ -1037,8 +1037,8 @@
 
           if(question_no != this.amountQ ){
             
-            this[randomOptionCorrect] = this.playerData.lesson[lessonIndex].game[question_no].ans.score;
-            // console.log("question_no : ", question_no);
+            this[randomOptionCorrect] = await this.playerData.lesson[lessonIndex].game[question_no].ans.score;
+          
             let textures_no = await this.answers.findIndex(tx => tx.guid === this.playerData.lesson[lessonIndex].game[question_no].ans.guid);
             let audio_no = question_no < this.speakQNo ? 1 : 2;
             this.VoiceLoaded = false;
@@ -1077,6 +1077,18 @@
         //   this.hasAnimatedChangeQuestion = true;
         // }
 
+      },
+
+      setOptionSocre(randomIndexForCorrect)
+      {
+        const options = this.options;
+        for(let i = 0;  i < options.length; i++) {
+          if(i != randomIndexForCorrect){
+            this[options[i]] = 0
+          }
+        }
+
+        return true;
       },
 
       async nextQuestion(point) {
@@ -1392,6 +1404,7 @@
         let words= null;
         let transcript ="";
         const stopRecognition = () => {
+            this.textureMic = 0;
             const tl = gsap.timeline();
             this.stopBGMusic(false);
             tl.to(this.$data,
@@ -1411,6 +1424,7 @@
 
         if (!this.isListening) {
           this.stopBGMusic(true);
+          this.textureMic = 1;
           try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             this.isListening = true;
@@ -1445,13 +1459,13 @@
                 if (words.length >= MAX_PHRASE_LENGTH) {
                     // console.log('Phrase is too long. Ignoring.');
                 }
-                if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
-                    stopRecognition();
-                    await this.nextQuestion(1);
-                    await this.animateChangeQuestionVoice2();
-                }else{
-                  this.countForSkip();
-                } 
+                // if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
+                //     stopRecognition();
+                //     await this.nextQuestion(1);
+                //     await this.animateChangeQuestionVoice2();
+                // }else{
+                //   this.countForSkip();
+                // } 
             };
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
@@ -1461,6 +1475,14 @@
             recognition.onend = async () => {
                 // console.log('Speech recognition ended.');
                 this.transcriptTracks = "...";
+                if (this.wordCheckForQMic.some(word => transcript.includes(word))) {
+                    stopRecognition();
+                    await this.nextQuestion(1);
+                    await this.animateChangeQuestionVoice2();
+                }else{
+                  this.sfxWrong.play();
+                  this.countForSkip();
+                } 
                 stopRecognition(); // Stop recognition when it naturally ends
               };
 
@@ -1471,7 +1493,7 @@
             timeoutId = setTimeout(() => {
                 // console.log('No speech detected. 10 seconds.');
                 stopRecognition()
-            }, 10000); // 10 seconds
+            }, 60000); // 60 seconds
 
           } catch (err) {
             // console.log('The following gUM error occured: ' + err);
